@@ -50,7 +50,7 @@ public class Controller implements Initializable {
 
     //background image
     public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
-    public Node<Point>[] landmarks = new Node[8];
+    public Node<Point>[] landmarks = new Node[6];
     public Coordinate startCoord, endCoord;
     public Point startPoint, endPoint;
     Node<?> node;
@@ -87,7 +87,7 @@ public class Controller implements Initializable {
     }
 
     public void createHistoricObjects() throws IOException {
-        String path = "src/System/Coords.csv";
+        String path = "WaterfordCityRoute/src/System/Coords.csv";
         FileReader file = new FileReader(path);
         BufferedReader csvReader = new BufferedReader(file);
         String line = "";

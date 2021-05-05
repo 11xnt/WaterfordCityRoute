@@ -6,14 +6,12 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class Utils {
 
-/*    Node<String>[] landmarks1(){
-        Node<String> peoples = new Node ("Peoples Park")
-    }*/
 
-    static String[] landmarks = {"Peoples Park", "Reginald Tower", "Waterford Distillery", "Waterford Crystal", "Apple Market", "The Wyse Park",
-    "Double Tower", "Waterford HSE", "WIT", "Church of Sacred Heart", "Abbey Road Gardens", "Ferry Bank Park"
+    static String[] landmarks = {"Peoples Park", "Reginald Tower", "Waterford Distillery", "Waterford Crystal", "Apple Market", "WIT"
     };
 
     public static Image imageToBW(Image image, double threshold) {
@@ -43,5 +41,25 @@ public class Utils {
 //        // gets the node that should have that x and y
 //        return nodes[(int) ((y * image.getWidth()) + x)];
 //    }
+
+    public static int getCostOfPath(List<Node<?>> path) {
+
+        if(path.size() <= 1) return 0;
+
+        int cost = 0;
+
+        for(int i = 0; i < path.size() - 1; i++) {
+            Node<?> currentNode = path.get(i);
+            Node<?> nextNode = path.get(i + 1);
+
+            for(Link adjEdge : currentNode.getAdjList()){
+                if(adjEdge.getDestNode().equals(nextNode))
+                    cost += adjEdge.getCost();
+            }
+
+        }
+
+        return cost;
+    }
 
 }

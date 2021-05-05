@@ -23,6 +23,27 @@ public class Node<T> {
         destNode.adjList.add( new Link(this,cost) ); //Add new link object to destination adjacency list
     }
 
+    public T getData() {
+        return data;
+    }
 
+    public void setData(T data) {
+        this.data = data;
+    }
 
+    public int getNodeValue() {
+        return nodeValue;
+    }
+
+    public void setNodeValue(int nodeValue) {
+        this.nodeValue = nodeValue;
+    }
+
+    public List<Link> getAdjList() {
+        return adjList;
+    }
+
+    public void setAdjList(List<Link> adjList) {
+        this.adjList = adjList;
+    }
 }
