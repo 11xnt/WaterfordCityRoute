@@ -15,7 +15,6 @@ public class SearchLogic <T> {
         this.start = start;
         this.end = end;
     }
-
     //Agenda list based breadth-first graph traversal (tail recursive)
 //    public static void traverseGraphBreadthFirst(List<Node<?>> agenda, List<Node<?>> encountered ){
 //        if(agenda.isEmpty()) return; // if agenda is empty -> return nothing.

@@ -46,4 +46,6 @@ public class Node<T> {
     public void setAdjList(List<Link> adjList) {
         this.adjList = adjList;
     }
+
+
 }

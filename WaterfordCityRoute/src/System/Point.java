@@ -1,8 +1,8 @@
 package System;
 
-public class Point {
+public class Point<T> {
 
-    public Node node;
+    //public Node<Point> node;
     private String type;
     private int x,y;
 
@@ -35,4 +35,6 @@ public class Point {
     public void setY(int y) {
         this.y = y;
     }
+
+
 }

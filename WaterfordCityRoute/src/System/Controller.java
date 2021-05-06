@@ -20,6 +20,8 @@ import javafx.scene.shape.Rectangle;
 
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.ResourceBundle;
 
 
@@ -98,7 +100,7 @@ public class Controller implements Initializable {
                 String[] values = line.split(",");
                 Point temp = new Point(values[0],Integer.parseInt(values[1]),Integer.parseInt(values[2]));
                 Node<Point> historicLandmark = new Node<>(temp);
-                System.out.println(historicLandmark.data.getType());
+                //System.out.println(historicLandmark.data.getType());
                 addNodesToLandmarksList(historicLandmark);
             } catch (Exception ignored) {
             }
@@ -125,7 +127,7 @@ public class Controller implements Initializable {
             createHistoricObjects();
             if(landmarks != null) {
                 for (int i = 0; i < landmarks.length; i++) {
-                    System.out.println(landmarks[i].data.getType());
+                    //System.out.println(landmarks[i].data.getType());
                     rec = new Rectangle(landmarks[i].data.getX(), landmarks[i].data.getY(), 5, 5);
                     rec.setFill(Color.RED);
                     //Hover over landmark
@@ -159,7 +161,15 @@ public class Controller implements Initializable {
 
     public Node<Point> matchingNode(Object choiceBox) {
         for(Node<Point> foundLandmark : landmarks) {
-            if (choiceBox.equals(foundLandmark.data.getType())) {
+            if (choiceBox.equals(foundLandmark.getData().getType())) {
+                return foundLandmark;
+            }
+        } return null;
+    }
+
+    public Node<Point> matchingInNode(Node<?> node) {
+        for(Node<Point> foundLandmark : landmarks) {
+            if (node.getData().equals(foundLandmark.getData())) {
                 return foundLandmark;
             }
         } return null;
@@ -168,28 +178,73 @@ public class Controller implements Initializable {
     public void djiRoute() {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
+        connectAllNodes();
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
-        System.out.println(startNode + " " + endNode);
-        startNode.connectToNodeUndirected(endNode, (int)(java.lang.Math.sqrt(((endNode.getData().getX()-startNode.getData().getX())*(endNode.getData().getX() - startNode.getData().getX()))+((endNode.getData().getY() - startNode.getData().getY()) * (endNode.getData().getY() - startNode.getData().getY())))));
+        //System.out.println(startNode + " " + endNode);
+        //startNode.connectToNodeUndirected(endNode, Utils.getCostOfPath(startNode,endNode));
         CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
+        assert cpa != null;
         for (Node<?> n : cpa.getPathList()){
             System.out.println(n.getData());
         }
+        drawPath(cpa.getPathList());
         System.out.println("\nThe total path cost is: " + cpa.pathCost);
-        Line line1 = new Line();
-        line1.setStartX(startNode.getData().getX());
-        line1.setStartY(startNode.getData().getY());
-        line1.setEndX(endNode.getData().getX());
-        line1.setEndY(endNode.getData().getY()+2.5);
-        line1.setLayoutX(mapDisplay.getLayoutX());
-        line1.setLayoutY(mapDisplay.getLayoutY());
-        line1.setFill(Color.CORAL);
+    }
+
+    public void drawPath(List<Node<?>> pathList) {
+        Node<Point> stPos = null;
+        Node<Point> enPos = null;
         ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
-        ((AnchorPane) mapDisplay.getParent()).getChildren().add(line1);
-        line1.toBack();
-        mapDisplay.toBack();
-        back.toBack();
+        //TODO: START -> DRAW LINE TO NEXT CLOSEST NODE -> CLOSEST NODE -> LAST NODE
+        for(int i = 0; i < pathList.size()-1; i++) {
+            Line line1 = new Line();
+            assert (matchingInNode(pathList.get(i))) != null;
+            stPos = matchingInNode(pathList.get(i));
+            assert (matchingInNode(pathList.get(i+1))) != null;
+            enPos = matchingInNode(pathList.get(i+1));
+            line1.setStartX(stPos.getData().getX());
+            line1.setStartY(stPos.getData().getY());
+            line1.setEndX(enPos.getData().getX());
+            line1.setEndY(enPos.getData().getY());
+            line1.setLayoutX(mapDisplay.getLayoutX());
+            line1.setLayoutY(mapDisplay.getLayoutY());
+            ((AnchorPane) mapDisplay.getParent()).getChildren().add(line1);
+            line1.toBack();
+            mapDisplay.toBack();
+            back.toBack();
+        }
+
+
+
+
+
+
+
+//        System.out.println(post.getData());
+//        //create line from the start node
+//        Line line1 = new Line();
+//        line1.setStartX(post.getData().getX());
+//        line1.setStartY(post.getData().getY());
+//
+//        assert cpa.getPathList().get(cpa.getPathList().indexOf(n)+1) != null;
+//        Node<Point> endPost = matchingInNode(cpa.getPathList().get(cpa.getPathList().indexOf(n)+1));
+//        line1.setEndX(endPost.getData().getX());
+//        line1.setEndY(endPost.getData().getY());
+//        line1.setLayoutX(mapDisplay.getLayoutX());
+//        line1.setLayoutY(mapDisplay.getLayoutY());
+//        line1.setFill(Color.CORAL);
+
+//        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
+//        line1.toBack();
+    }
+
+    public void connectAllNodes() {
+        for(int i=0; i< landmarks.length-1;i++) {
+            assert landmarks[i+1]!=null;
+            landmarks[i].connectToNodeUndirected(landmarks[i+1], Utils.getCostOfPath(landmarks[i], landmarks[i+1]));
+            //System.out.println(landmarks[i] + " " + landmarks[i+1]);
+        }
     }
 
 

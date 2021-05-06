@@ -42,24 +42,32 @@ public class Utils {
 //        return nodes[(int) ((y * image.getWidth()) + x)];
 //    }
 
-    public static int getCostOfPath(List<Node<?>> path) {
+    public static int getCostOfPath(Node<Point> startNode, Node<Point> endNode) {
 
-        if(path.size() <= 1) return 0;
+//        if(path.size() <= 1) return 0;
+//
+//        int cost = 0;
+//
+//        for(int i = 0; i < path.size() - 1; i++) {
+//            Node<?> currentNode = path.get(i);
+//            Node<?> nextNode = path.get(i + 1);
+//
+//            for(Link adjEdge : currentNode.getAdjList()){
+//                if(adjEdge.getDestNode().equals(nextNode))
+//                    cost += adjEdge.getCost();
+//            }
+//
+//        }
+//
+//        return cost;
+        int pathCost = (int)(java.lang.Math.sqrt(((endNode.getData().getX()-startNode.getData().getX())*(endNode.getData().getX() - startNode.getData().getX()))+
+                ((endNode.getData().getY() - startNode.getData().getY()) * (endNode.getData().getY() - startNode.getData().getY()))));
 
-        int cost = 0;
-
-        for(int i = 0; i < path.size() - 1; i++) {
-            Node<?> currentNode = path.get(i);
-            Node<?> nextNode = path.get(i + 1);
-
-            for(Link adjEdge : currentNode.getAdjList()){
-                if(adjEdge.getDestNode().equals(nextNode))
-                    cost += adjEdge.getCost();
-            }
-
+        if(pathCost < 0) {
+            pathCost = pathCost*-1;
         }
+        return pathCost;
 
-        return cost;
     }
 
 }
