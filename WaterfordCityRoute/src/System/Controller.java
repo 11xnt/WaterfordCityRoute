@@ -14,6 +14,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import java.io.*;
 import java.net.URL;
+
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 
@@ -82,7 +84,7 @@ public class Controller implements Initializable {
             bfsRoute();
         }
         else if(djiRadio.isSelected() && shortRadio.isSelected()) {
-            djiRoute(foundStart, foundEnd);
+            djiRoute();
         }
     }
 
@@ -134,44 +136,60 @@ public class Controller implements Initializable {
                     rec.setLayoutX(mapDisplay.getLayoutX());
                     rec.setLayoutY(mapDisplay.getLayoutY());
                     ((AnchorPane) mapDisplay.getParent()).getChildren().add(rec);
-                    String empty = "";
-                    Tooltip tt = new Tooltip();
-                    Tooltip.install(rec, new Tooltip(empty+(landmarks[i].data)));
-                    tt.setText(empty+(landmarks[i].data));
-
+                    Tooltip.install(rec, new Tooltip(Utils.landmarks[i]));
                 }
             }
-        } else ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);
+            startBox.getItems().clear();
+            destinationBox.getItems().clear();
+            choiceBoxLandmarks();
+        } else {((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);}
     }
 
+    public void choiceBoxLandmarks() {
+        Node<Point> landmark;
+        for (int i=0; i < landmarks.length; i++) {
+            startBox.getItems().add(i, landmarks[i].data.getType());
+            destinationBox.getItems().add(i, landmarks[i].data.getType());
+        }
+    }
 
     /**
      * FOR DJI ROUTING
-     * @param foundStart
-     * @param foundEnd
      */
 
-    public void djiRoute(Node<Point> foundStart, Node<Point> foundEnd) {
-//        Node2<Point> a = new Node2<>(startPoint);
-//        Node2<Point> b = new Node2<>(endPoint);
-//        a.connectToNodeUndirected(b,  (int)(java.lang.Math.sqrt(((endPoint.x-startPoint.x)*(endPoint.x-startPoint.x))+((endPoint.y-startPoint.y)*(endPoint.y-startPoint.y)))));
-//       // CostedPath cpa = SearchLogic.findCheapestPathDijkstra(foundStart, foundEnd.data);
-//        for(Node<?> n : cpa.pathList)
-//            System.out.println(n.data);
-//        System.out.println("\nThe total path cost is: "+cpa.pathCost);
-//        Line line1 = new Line();
-//        line1.setStartX(startPoint.x);
-//        line1.setStartY(startPoint.y);
-//        line1.setEndX(endPoint.x);
-//        line1.setEndY(endPoint.y+2.5);
-//        line1.setFill(Color.CORAL);
-//        line1.setLayoutX(mapDisplay.getLayoutX());
-//        line1.setLayoutY(mapDisplay.getLayoutY());
-//        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
-//        ((AnchorPane) mapDisplay.getParent()).getChildren().add(line1);
-//        line1.toBack();
-//        mapDisplay.toBack();
-//        back.toBack();
+    public Node<Point> matchingNode(Object choiceBox) {
+        for(Node<Point> foundLandmark : landmarks) {
+            if (choiceBox.equals(foundLandmark.data.getType())) {
+                return foundLandmark;
+            }
+        } return null;
+    }
+
+    public void djiRoute() {
+        Node<Point> startNode = null;
+        Node<Point> endNode = null;
+        startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
+        endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
+        System.out.println(startNode + " " + endNode);
+        startNode.connectToNodeUndirected(endNode, (int)(java.lang.Math.sqrt(((endNode.getData().getX()-startNode.getData().getX())*(endNode.getData().getX() - startNode.getData().getX()))+((endNode.getData().getY() - startNode.getData().getY()) * (endNode.getData().getY() - startNode.getData().getY())))));
+        CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
+        for (Node<?> n : cpa.getPathList()){
+            System.out.println(n.getData());
+        }
+        System.out.println("\nThe total path cost is: " + cpa.pathCost);
+        Line line1 = new Line();
+        line1.setStartX(startNode.getData().getX());
+        line1.setStartY(startNode.getData().getY());
+        line1.setEndX(endNode.getData().getX());
+        line1.setEndY(endNode.getData().getY()+2.5);
+        line1.setLayoutX(mapDisplay.getLayoutX());
+        line1.setLayoutY(mapDisplay.getLayoutY());
+        line1.setFill(Color.CORAL);
+        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
+        ((AnchorPane) mapDisplay.getParent()).getChildren().add(line1);
+        line1.toBack();
+        mapDisplay.toBack();
+        back.toBack();
     }
 
 

@@ -1,6 +1,8 @@
 package System;
 
 public class Point {
+
+    public Node node;
     private String type;
     private int x,y;
 
