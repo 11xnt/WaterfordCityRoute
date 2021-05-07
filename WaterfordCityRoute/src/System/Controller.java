@@ -19,10 +19,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.ResourceBundle;
+import java.util.*;
 
 
 public class Controller implements Initializable {
@@ -56,13 +53,14 @@ public class Controller implements Initializable {
 
     //background image
     public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
-    public Node<Point>[] landmarks = new Node[6];
+    public List<Node<Point>> landmarks = new ArrayList<>();
     public Coordinate startCoord, endCoord;
     public Point startPoint, endPoint;
     Node<?> node;
     Link link;
     public Node<Point> foundStart, foundEnd;
     public Node<Point>[] imageArray = new Node[width*height];
+    public List<Node<Point>> historicLandmarks = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -72,6 +70,11 @@ public class Controller implements Initializable {
         pixel = new int[width * height];
         establishNodesOnMap();
         connectNodesWithLinks();
+        try {
+            createHistoricObjects();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startingLandmark(ActionEvent actionEvent) {
@@ -85,6 +88,9 @@ public class Controller implements Initializable {
 
     public void runSearch(ActionEvent actionEvent) {
         if(bfsRadio.isSelected() && shortRadio.isSelected()) {
+            bfsRoute();
+        }
+        else if(bfsRadio.isSelected() && shortRadio.isSelected()) {
             bfsRoute();
         }
         else if(djiRadio.isSelected() && shortRadio.isSelected()) {
@@ -114,49 +120,50 @@ public class Controller implements Initializable {
 
     // this is really scuffed but idk it works
     public void addNodesToLandmarksList(Node<Point> historicLandmark) {
-        int i=0;
-        while(landmarks[i]!=null) {
-            i++;
-            if(i == landmarks.length-1) {
-                break;
-            }
-        }
-        if(landmarks[i]==null) {
-            landmarks[i]=historicLandmark;
-        }
+//        int i=0;
+//        while(landmarks.get(i)!=null) {
+//            i++;
+//            if(i == landmarks.size()) {
+//                break;
+//            }
+//        }
+//        if(landmarks.g) {
+//            landmarks.set(i, historicLandmark);
+//        }
+        landmarks.add(historicLandmark);
     }
 
     // Toggles Landmarks on and off
     public void showLandmarks() throws IOException {
         if(show.isSelected()) {
-            createHistoricObjects();
-            if(landmarks != null) {
-                for (int i = 0; i < landmarks.length; i++) {
+            if(!landmarks.isEmpty()) {
+                for (int i = 0; i < landmarks.size(); i++) {
                     //System.out.println(landmarks[i].data.getType());
-                    rec = new Rectangle(landmarks[i].data.getX(), landmarks[i].data.getY(), 5, 5);
+                    rec = new Rectangle(landmarks.get(i).getData().getX(), landmarks.get(i).getData().getY(), 5, 5);
                     rec.setFill(Color.RED);
                     //Hover over landmark
-                    rec.setX(landmarks[i].data.getX() - 2.5);
-                    rec.setY(landmarks[i].data.getY() - 2.5);
+                    rec.setX(landmarks.get(i).getData().getX() - 2.5);
+                    rec.setY(landmarks.get(i).getData().getY() - 2.5);
                     rec.setWidth(10);
                     rec.setHeight(10);
                     rec.setLayoutX(mapDisplay.getLayoutX());
                     rec.setLayoutY(mapDisplay.getLayoutY());
                     ((AnchorPane) mapDisplay.getParent()).getChildren().add(rec);
-                    Tooltip.install(rec, new Tooltip(Utils.landmarks[i]));
+                    Tooltip.install(rec, new Tooltip(landmarks.get(i).getData().getType()));
+                    //tils.landmarks[i]
                 }
             }
-            startBox.getItems().clear();
-            destinationBox.getItems().clear();
             choiceBoxLandmarks();
         } else {((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);}
     }
 
     public void choiceBoxLandmarks() {
         Node<Point> landmark;
-        for (int i = 0; i < landmarks.length; i++) {
-            startBox.getItems().add(i, landmarks[i].data.getType());
-            destinationBox.getItems().add(i, landmarks[i].data.getType());
+        startBox.getItems().removeAll(startBox.getItems());
+        destinationBox.getItems().removeAll(destinationBox.getItems());
+        for (int i = 0; i < landmarks.size(); i++) {
+            startBox.getItems().add(i, landmarks.get(i).getData().getType());
+            destinationBox.getItems().add(i, landmarks.get(i).getData().getType());
         }
     }
 
@@ -165,9 +172,9 @@ public class Controller implements Initializable {
         Node<Point> landmark;
         int j = 0;
         if(startBox.getSelectionModel().getSelectedItem()!=null && destinationBox.getSelectionModel().getSelectedItem()!=null) {
-            for (int i = 0; i < landmarks.length; i++) {
-                if (!startBox.getSelectionModel().getSelectedItem().equals(landmarks[i].getData().getType()) && !startBox.getSelectionModel().getSelectedItem().equals(landmarks[i].getData().getType())) {
-                    comboLandmark.getItems().add(j, landmarks[i].data.getType());
+            for (int i = 0; i < landmarks.size(); i++) {
+                if (!startBox.getSelectionModel().getSelectedItem().equals(landmarks.get(i).getData().getType()) && !startBox.getSelectionModel().getSelectedItem().equals(landmarks.get(i).getData().getType())) {
+                    comboLandmark.getItems().add(j, landmarks.get(i).data.getType());
                     j++;
                 }
             }
@@ -210,8 +217,12 @@ public class Controller implements Initializable {
         System.out.println("\nThe total path cost is: " + cpa.pathCost);
     }
 
-    // makes sure all nodes are travelled.
+    // finds the historic route and displays it
     public void djiHistRoute() {
+        Node<Point> startNode = null;
+        Node<Point> endNode = null;
+        connectAllHistoricNodes();
+
 
     }
 
@@ -219,7 +230,6 @@ public class Controller implements Initializable {
         Node<Point> stPos = null;
         Node<Point> enPos = null;
         ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
-        //TODO: START -> DRAW LINE TO NEXT CLOSEST NODE -> CLOSEST NODE -> LAST NODE
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
             assert (matchingInNode(pathList.get(i))) != null;
@@ -237,35 +247,28 @@ public class Controller implements Initializable {
             mapDisplay.toBack();
             back.toBack();
         }
+    }
 
+    public void connectAllHistoricNodes() {
+        historicLandmarks.removeAll(landmarks);
+        for(int i=0; i<= landmarks.size()-1;i++) {
+            if (Arrays.stream(Utils.historic).anyMatch(landmarks.get(i).getData().getType()::contains)) {
+                historicLandmarks.add(landmarks.get(i));
+            }
+        }
+//        assert !historicLandmarks.isEmpty();
+        for(int j = 0; j < historicLandmarks.size()-1;j++) {
+            historicLandmarks.get(j).connectToNodeUndirected(historicLandmarks.get(j+1), Utils.getCostOfPath(historicLandmarks.get(j), historicLandmarks.get(j+1)));
+            //System.out.println(historicLandmarks.get(j).getData().getType() + " " + historicLandmarks.get(j+1).getData().getType());
+            System.out.println(historicLandmarks.get(j).getData().getType());
+        }
 
-
-
-
-
-
-//        System.out.println(post.getData());
-//        //create line from the start node
-//        Line line1 = new Line();
-//        line1.setStartX(post.getData().getX());
-//        line1.setStartY(post.getData().getY());
-//
-//        assert cpa.getPathList().get(cpa.getPathList().indexOf(n)+1) != null;
-//        Node<Point> endPost = matchingInNode(cpa.getPathList().get(cpa.getPathList().indexOf(n)+1));
-//        line1.setEndX(endPost.getData().getX());
-//        line1.setEndY(endPost.getData().getY());
-//        line1.setLayoutX(mapDisplay.getLayoutX());
-//        line1.setLayoutY(mapDisplay.getLayoutY());
-//        line1.setFill(Color.CORAL);
-
-//        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
-//        line1.toBack();
     }
 
     public void connectAllNodes() {
-        for(int i=0; i< landmarks.length-1;i++) {
-            assert landmarks[i+1]!=null;
-            landmarks[i].connectToNodeUndirected(landmarks[i+1], Utils.getCostOfPath(landmarks[i], landmarks[i+1]));
+        for(int i=0; i< landmarks.size()-1;i++) {
+            assert landmarks.get(i+1)!=null;
+            landmarks.get(i).connectToNodeUndirected(landmarks.get(i+1), Utils.getCostOfPath(landmarks.get(i), landmarks.get(i+1)));
             //System.out.println(landmarks[i] + " " + landmarks[i+1]);
         }
     }
@@ -351,6 +354,8 @@ public class Controller implements Initializable {
 
 
     public void bfsRoute() {
+
+
 
 
     }

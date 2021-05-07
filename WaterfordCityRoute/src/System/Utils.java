@@ -11,7 +11,7 @@ import java.util.List;
 public class Utils {
 
 
-    static String[] landmarks = {"Peoples Park", "Reginald Tower", "Waterford Distillery", "Waterford Crystal", "Apple Market", "WIT"
+    static String[] historic = {"Reginald Tower", "Waterford Crystal", "Bull Post", "Double Tower","Clock Tower"
     };
 
     public static Image imageToBW(Image image, double threshold) {
@@ -35,6 +35,8 @@ public class Utils {
         }
         return writableImage;
     }
+
+
 
 //    public static Node<Color> aquireCoordFromMousePosition(Image image, int x, int y, Node<Color>[] nodes) {
 //
