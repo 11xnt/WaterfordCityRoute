@@ -41,6 +41,8 @@ public class Controller implements Initializable {
     Rectangle rec;
     @FXML
     RadioButton bfsRadio, djiRadio, hisRadio, shortRadio;
+    @FXML
+    ComboBox comboLandmark;
 
 
     static int[] pixel;
@@ -86,7 +88,10 @@ public class Controller implements Initializable {
             bfsRoute();
         }
         else if(djiRadio.isSelected() && shortRadio.isSelected()) {
-            djiRoute();
+            djiShortRoute();
+        }
+        else if(djiRadio.isSelected() && hisRadio.isSelected()) {
+            djiHistRoute();
         }
     }
 
@@ -149,12 +154,25 @@ public class Controller implements Initializable {
 
     public void choiceBoxLandmarks() {
         Node<Point> landmark;
-        for (int i=0; i < landmarks.length; i++) {
+        for (int i = 0; i < landmarks.length; i++) {
             startBox.getItems().add(i, landmarks[i].data.getType());
             destinationBox.getItems().add(i, landmarks[i].data.getType());
         }
     }
 
+    public void updateComboBox(ActionEvent event) {
+        comboLandmark.getItems().clear();
+        Node<Point> landmark;
+        int j = 0;
+        if(startBox.getSelectionModel().getSelectedItem()!=null && destinationBox.getSelectionModel().getSelectedItem()!=null) {
+            for (int i = 0; i < landmarks.length; i++) {
+                if (!startBox.getSelectionModel().getSelectedItem().equals(landmarks[i].getData().getType()) && !startBox.getSelectionModel().getSelectedItem().equals(landmarks[i].getData().getType())) {
+                    comboLandmark.getItems().add(j, landmarks[i].data.getType());
+                    j++;
+                }
+            }
+        }
+    }
     /**
      * FOR DJI ROUTING
      */
@@ -175,7 +193,7 @@ public class Controller implements Initializable {
         } return null;
     }
 
-    public void djiRoute() {
+    public void djiShortRoute() {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
         connectAllNodes();
@@ -190,6 +208,11 @@ public class Controller implements Initializable {
         }
         drawPath(cpa.getPathList());
         System.out.println("\nThe total path cost is: " + cpa.pathCost);
+    }
+
+    // makes sure all nodes are travelled.
+    public void djiHistRoute() {
+
     }
 
     public void drawPath(List<Node<?>> pathList) {
@@ -328,6 +351,7 @@ public class Controller implements Initializable {
 
 
     public void bfsRoute() {
+
 
     }
 

@@ -1,6 +1,6 @@
 package System;
 
-public class Point<T> {
+public class Point {
 
     //public Node<Point> node;
     private String type;
