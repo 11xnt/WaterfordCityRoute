@@ -1,10 +1,13 @@
 package System;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -41,6 +44,12 @@ public class Controller implements Initializable {
     @FXML
     ComboBox comboLandmark;
 
+    @FXML
+    TableView landmarksTable;
+
+    @FXML
+    TableColumn landmarkColumn;
+
 
     static int[] pixel;
 
@@ -75,6 +84,10 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        ObservableList<String> visited = FXCollections.observableArrayList(Utils.historic);
+        landmarksTable.setItems(visited);
+        landmarksTable.getItems().add(visited);
+        landmarkColumn.setCellValueFactory(new PropertyValueFactory);
     }
 
     public void startingLandmark(ActionEvent actionEvent) {

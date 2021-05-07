@@ -41,17 +41,20 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<Pane stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
+<Pane stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
    <children>
       <AnchorPane layoutX="10.0" layoutY="10.0" maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="1201.0">
          <children>
-            <ImageView fx:id="back" fitHeight="734.0" fitWidth="1200.0" layoutX="14.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="back" fitHeight="734.0" fitWidth="1214.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
             <Button id="but" fx:id="routeSearch" layoutX="601.0" layoutY="640.0" mnemonicParsing="false" onAction="#runSearch" prefHeight="44.0" prefWidth="108.0" text="Route Search" />
             <Label layoutX="37.0" layoutY="57.0" text="Route Model" />
             <Line endX="44.0" layoutX="108.0" layoutY="142.0" startX="-100.0" />
@@ -71,17 +74,26 @@
             <RadioButton fx:id="bfsRadio" layoutX="24.0" layoutY="216.0" mnemonicParsing="false" text="BFS" toggleGroup="$RouteMethodG" />
             <Button id="but" fx:id="startBut" layoutX="254.0" layoutY="650.0" mnemonicParsing="false" onAction="#startingLandmark" text="Start Position" />
             <Button id="but" layoutX="372.0" layoutY="650.0" mnemonicParsing="false" onAction="#destinationLandmark" text="Destination Button" />
-            <ImageView fx:id="mapDisplay" fitHeight="580.0" fitWidth="944.0" layoutX="176.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="mapDisplay" fitHeight="580.0" fitWidth="944.0" layoutX="169.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true" />
             <Label layoutX="13.0" layoutY="329.0" text="Choose landmarks points" />
             <ChoiceBox fx:id="startBox" layoutX="5.0" layoutY="375.0" prefWidth="150.0" />
             <ChoiceBox fx:id="destinationBox" layoutX="5.0" layoutY="434.0" prefWidth="150.0" />
             <Line endX="44.0" layoutX="108.0" layoutY="346.0" startX="-100.0" />
             <Label layoutX="62.0" layoutY="358.0" text="Start" />
             <Label layoutX="50.0" layoutY="417.0" text="Destination" />
-            <CheckBox fx:id="show" layoutX="8.0" layoutY="499.0" mnemonicParsing="false" onAction="#showLandmarks" text="Show Landmarks" />
-            <Label layoutX="14.0" layoutY="558.0" text="Choose landmarks to visit" />
-            <ComboBox fx:id="comboLandmark" layoutX="7.0" layoutY="594.0" prefWidth="150.0" />
-            <Button id="but" layoutX="46.0" layoutY="649.0" mnemonicParsing="false" onAction="#updateComboBox" text="Refresh" />
+            <CheckBox fx:id="show" layoutX="10.0" layoutY="289.0" mnemonicParsing="false" onAction="#showLandmarks" text="Show Landmarks" />
+            <Label layoutX="877.0" layoutY="672.0" text="Choose landmarks to visit" />
+            <ComboBox fx:id="comboLandmark" layoutX="870.0" layoutY="708.0" prefWidth="150.0" />
+            <Button id="but" layoutX="786.0" layoutY="651.0" mnemonicParsing="false" onAction="#updateComboBox" text="Refresh" />
+            <VBox layoutX="11.0" layoutY="478.0" prefHeight="170.0" prefWidth="150.0">
+               <children>
+                  <TableView fx:id="landmarksTable" prefHeight="200.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="landmarkColumn" prefWidth="149.0" text="Landmarks to visit" />
+                    </columns>
+                  </TableView>
+               </children>
+            </VBox>
          </children>
       </AnchorPane>
       <MenuBar id="windows7" layoutX="-1.0" layoutY="1.0" prefHeight="25.0" prefWidth="1211.0">
