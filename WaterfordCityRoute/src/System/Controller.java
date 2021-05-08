@@ -65,6 +65,7 @@ public class Controller implements Initializable {
     public Node<Point> foundStart, foundEnd;
     public Node<Point>[] imageArray = new Node[width*height];
     public List<Node<Point>> historicLandmarks = new ArrayList<>();
+    public List<Node<Point>> junctions = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
