@@ -123,6 +123,10 @@ public class Controller implements Initializable {
             } catch (Exception ignored) {
             }
         }
+        for (int i =0; i < landmarks.size();i++) {
+            System.out.println(i + ": " + landmarks.get(i).getData().getType());
+        }
+        createHistoricNodesSublist();
     }
 
     public void createJunctionObjects() throws IOException {
@@ -135,7 +139,6 @@ public class Controller implements Initializable {
                 String[] values = line.split(",");
                 Point temp = new Point(values[0],Integer.parseInt(values[1]),Integer.parseInt(values[2]));
                 Node<Point> junction = new Node<>(temp);
-                //System.out.println(junction.data.getType());
                 junctions.add(junction);
             } catch (Exception ignored) {
             }
@@ -247,16 +250,30 @@ public class Controller implements Initializable {
         } return null;
     }
 
+    public Node<Point> matchingAllNode(Node<?> node) {
+        List<Node<Point>> allPoints = new ArrayList<Node<Point>>();
+        allPoints.addAll(landmarks);
+        allPoints.addAll(historicLandmarks);
+        allPoints.addAll(junctions);
+        for(Node<Point> foundLandmark : allPoints) {
+            if (node.getData().equals(foundLandmark.getData())) {
+                return foundLandmark;
+            }
+        } return null;
+    }
+
     public void djiShortRoute() {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
         //connectAllHistoricNodes();
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
+        if(startNode.getAdjList().isEmpty()) {
+            connectJunctions();
+        }
         //System.out.println(startNode + " " + endNode);
         //startNode.connectToNodeUndirected(endNode, Utils.getCostOfPath(startNode,endNode));
         CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
-        assert cpa != null;
         for (Node<?> n : cpa.getPathList()){
             System.out.println(n.getData());
         }
@@ -268,24 +285,33 @@ public class Controller implements Initializable {
     public void djiHistRoute() {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
-        connectAllHistoricNodes();
+        Node<Point> closestHistoric;
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
 
-        //CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, )
+        do {
+            closestHistoric = findClosestHistoricLandmark(startNode);
+            CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, closestHistoric.getData());
+            startNode = closestHistoric;
+        } while (closestHistoric == endNode);
+
 
     }
 
+    public Node<Point> findClosestHistoricLandmark(Node<Point> startNode) {
+        Node<Point> foundClosest;
+        for(int i = 0; i<historicLandmarks.size();i++) {
+            Utils.getCostOfPath(startNode,historicLandmarks.get(i));
+        }
+        return null;
+    }
+
     public void drawPath(List<Node<?>> pathList) {
-        Node<Point> stPos = null;
-        Node<Point> enPos = null;
         ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
-            assert (matchingInNode(pathList.get(i))) != null;
-            stPos = matchingInNode(pathList.get(i));
-            assert (matchingInNode(pathList.get(i+1))) != null;
-            enPos = matchingInNode(pathList.get(i+1));
+            Node<Point> stPos = matchingAllNode(pathList.get(i));
+            Node<Point> enPos = matchingAllNode(pathList.get(i+1));
             line1.setStartX(stPos.getData().getX());
             line1.setStartY(stPos.getData().getY());
             line1.setEndX(enPos.getData().getX());
@@ -321,7 +347,7 @@ public class Controller implements Initializable {
         junctions.get(5).connectToNodeUndirected(junctions.get(17), Utils.getCostOfPath(junctions.get(5), junctions.get(17)));
         junctions.get(6).connectToNodeUndirected(junctions.get(8), Utils.getCostOfPath(junctions.get(6), junctions.get(8)));
         junctions.get(28).connectToNodeUndirected(junctions.get(6), Utils.getCostOfPath(junctions.get(7), junctions.get(4)));
-        junctions.get(41).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(41), historicLandmarks.get(0)));
+        junctions.get(40).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(40), historicLandmarks.get(0)));
         junctions.get(10).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(10), historicLandmarks.get(0)));
         junctions.get(10).connectToNodeUndirected(junctions.get(11), Utils.getCostOfPath(junctions.get(10), junctions.get(11)));
         junctions.get(11).connectToNodeUndirected(junctions.get(12), Utils.getCostOfPath(junctions.get(11), junctions.get(12)));
@@ -361,25 +387,18 @@ public class Controller implements Initializable {
         junctions.get(20).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(20), historicLandmarks.get(0)));
         junctions.get(21).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(21), historicLandmarks.get(0)));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+       // 5=wit,4=applemarket,2=waterforddis
+        landmarks.get(5).connectToNodeUndirected(junctions.get(40), Utils.getCostOfPath(landmarks.get(5),junctions.get(40)));
+        landmarks.get(5).connectToNodeUndirected(historicLandmarks.get(3), Utils.getCostOfPath(landmarks.get(5),historicLandmarks.get(3)));
+        //landmarks.get(7).connectToNodeUndirected(junctions.get(21), Utils.getCostOfPath(landmarks.get(7),junctions.get(21)));
+        landmarks.get(4).connectToNodeUndirected(junctions.get(19), Utils.getCostOfPath(landmarks.get(4),junctions.get(19)));
+        landmarks.get(4).connectToNodeUndirected(junctions.get(27), Utils.getCostOfPath(landmarks.get(4),junctions.get(27)));
+        landmarks.get(4).connectToNodeUndirected(junctions.get(20), Utils.getCostOfPath(landmarks.get(4),junctions.get(20)));
+        landmarks.get(2).connectToNodeUndirected(junctions.get(13), Utils.getCostOfPath(landmarks.get(2),junctions.get(13)));
     }
 
     // separates the historic nodes from the normal landmarks
-    public void connectAllHistoricNodes() {
+    public void createHistoricNodesSublist() {
         historicLandmarks.removeAll(landmarks);
         for(int i = 0; i <= landmarks.size()-1; i++) {
             if (Arrays.stream(Utils.historic).anyMatch(landmarks.get(i).getData().getType()::contains)) {
