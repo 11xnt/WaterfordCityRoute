@@ -1,7 +1,5 @@
 package System;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -43,13 +41,10 @@ public class Controller implements Initializable {
     RadioButton bfsRadio, djiRadio, hisRadio, shortRadio;
     @FXML
     ComboBox comboLandmark;
-
     @FXML
-    TableView landmarksTable;
-
+    public TableView<Point> landmarksTable;
     @FXML
-    TableColumn landmarkColumn;
-
+    public TableColumn<Point, String> landmarkColumn;
 
     static int[] pixel;
 
@@ -84,11 +79,19 @@ public class Controller implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ObservableList<String> visited = FXCollections.observableArrayList(Utils.historic);
-        landmarksTable.setItems(visited);
-        landmarksTable.getItems().add(visited);
-        landmarkColumn.setCellValueFactory(new PropertyValueFactory);
+        }
+
+    public void loadTable() {
+        landmarksTable.getItems().clear();
+        landmarkColumn.setCellValueFactory(new PropertyValueFactory<Point, String>("type"));
+
+        for (int i = 0; i < landmarks.size()-1;i++) {
+            landmarksTable.getItems().add(landmarks.get(i).getData());
+        }
+            landmarksTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
     }
+
 
     public void startingLandmark(ActionEvent actionEvent) {
         coordStartLocator();
@@ -148,6 +151,7 @@ public class Controller implements Initializable {
 
     // Toggles Landmarks on and off
     public void showLandmarks() throws IOException {
+        loadTable();
         if(show.isSelected()) {
             if(!landmarks.isEmpty()) {
                 for (int i = 0; i < landmarks.size(); i++) {
@@ -235,8 +239,6 @@ public class Controller implements Initializable {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
         connectAllHistoricNodes();
-
-
     }
 
     public void drawPath(List<Node<?>> pathList) {

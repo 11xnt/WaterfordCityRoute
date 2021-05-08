@@ -50,7 +50,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<Pane stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
+<Pane stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
    <children>
       <AnchorPane layoutX="10.0" layoutY="10.0" maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="1201.0">
          <children>
