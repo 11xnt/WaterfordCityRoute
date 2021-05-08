@@ -335,6 +335,7 @@ public class Controller implements Initializable {
         junctions.get(18).connectToNodeUndirected(junctions.get(17), Utils.getCostOfPath(junctions.get(18), junctions.get(17)));
         //Connects P17 to Waterford Crystal (historic)
         junctions.get(17).connectToNodeUndirected(historicLandmarks.get(1), Utils.getCostOfPath(junctions.get(17), historicLandmarks.get(1)));
+        junctions.get(18).connectToNodeUndirected(historicLandmarks.get(1), Utils.getCostOfPath(junctions.get(18), historicLandmarks.get(1)));
         junctions.get(17).connectToNodeUndirected(junctions.get(7), Utils.getCostOfPath(junctions.get(17), junctions.get(7)));
         junctions.get(7).connectToNodeUndirected(junctions.get(4), Utils.getCostOfPath(junctions.get(7), junctions.get(4)));
         junctions.get(4).connectToNodeUndirected(junctions.get(5), Utils.getCostOfPath(junctions.get(4), junctions.get(5)));
@@ -348,7 +349,7 @@ public class Controller implements Initializable {
         junctions.get(6).connectToNodeUndirected(junctions.get(8), Utils.getCostOfPath(junctions.get(6), junctions.get(8)));
         junctions.get(28).connectToNodeUndirected(junctions.get(6), Utils.getCostOfPath(junctions.get(7), junctions.get(4)));
         junctions.get(40).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(40), historicLandmarks.get(0)));
-        junctions.get(10).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(10), historicLandmarks.get(0)));
+        junctions.get(10).connectToNodeUndirected(historicLandmarks.get(4), Utils.getCostOfPath(junctions.get(10), historicLandmarks.get(4)));
         junctions.get(10).connectToNodeUndirected(junctions.get(11), Utils.getCostOfPath(junctions.get(10), junctions.get(11)));
         junctions.get(11).connectToNodeUndirected(junctions.get(12), Utils.getCostOfPath(junctions.get(11), junctions.get(12)));
         junctions.get(12).connectToNodeUndirected(junctions.get(13), Utils.getCostOfPath(junctions.get(12), junctions.get(13)));
@@ -361,12 +362,12 @@ public class Controller implements Initializable {
         junctions.get(16).connectToNodeUndirected(junctions.get(31), Utils.getCostOfPath(junctions.get(16), junctions.get(31)));
         junctions.get(35).connectToNodeUndirected(junctions.get(36), Utils.getCostOfPath(junctions.get(35), junctions.get(36)));
         junctions.get(36).connectToNodeUndirected(junctions.get(37), Utils.getCostOfPath(junctions.get(36), junctions.get(37)));
-        junctions.get(37).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(37), historicLandmarks.get(0)));
+        junctions.get(37).connectToNodeUndirected(historicLandmarks.get(2), Utils.getCostOfPath(junctions.get(37), historicLandmarks.get(2)));
         junctions.get(28).connectToNodeUndirected(junctions.get(29), Utils.getCostOfPath(junctions.get(28), junctions.get(29)));
         junctions.get(29).connectToNodeUndirected(junctions.get(30), Utils.getCostOfPath(junctions.get(29), junctions.get(30)));
         junctions.get(31).connectToNodeUndirected(junctions.get(30), Utils.getCostOfPath(junctions.get(31), junctions.get(30)));
-        junctions.get(30).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(30), historicLandmarks.get(0)));
-        junctions.get(33).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(33), historicLandmarks.get(0)));
+        junctions.get(30).connectToNodeUndirected(historicLandmarks.get(2), Utils.getCostOfPath(junctions.get(30), historicLandmarks.get(2)));
+        junctions.get(33).connectToNodeUndirected(historicLandmarks.get(2), Utils.getCostOfPath(junctions.get(33), historicLandmarks.get(2)));
         junctions.get(33).connectToNodeUndirected(junctions.get(38), Utils.getCostOfPath(junctions.get(33), junctions.get(38)));
         junctions.get(38).connectToNodeUndirected(junctions.get(39), Utils.getCostOfPath(junctions.get(38), junctions.get(39)));
         junctions.get(39).connectToNodeUndirected(junctions.get(23), Utils.getCostOfPath(junctions.get(39), junctions.get(23)));
@@ -386,6 +387,7 @@ public class Controller implements Initializable {
         junctions.get(19).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(19), historicLandmarks.get(0)));
         junctions.get(20).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(20), historicLandmarks.get(0)));
         junctions.get(21).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(21), historicLandmarks.get(0)));
+        junctions.get(42).connectToNodeUndirected(junctions.get(4), Utils.getCostOfPath(junctions.get(42), junctions.get(4)));
 
        // 5=wit,4=applemarket,2=waterforddis
         landmarks.get(5).connectToNodeUndirected(junctions.get(40), Utils.getCostOfPath(landmarks.get(5),junctions.get(40)));
