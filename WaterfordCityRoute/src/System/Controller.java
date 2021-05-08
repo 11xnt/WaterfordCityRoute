@@ -57,13 +57,14 @@ public class Controller implements Initializable {
 
     //background image
     public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
-    public List<Node<Point>> landmarks = new ArrayList<>();
     public Coordinate startCoord, endCoord;
     public Point startPoint, endPoint;
     Node<?> node;
     Link link;
     public Node<Point> foundStart, foundEnd;
     public Node<Point>[] imageArray = new Node[width*height];
+
+    public List<Node<Point>> landmarks = new ArrayList<>();
     public List<Node<Point>> historicLandmarks = new ArrayList<>();
     public List<Node<Point>> junctions = new ArrayList<>();
 
@@ -76,23 +77,12 @@ public class Controller implements Initializable {
         establishNodesOnMap();
         connectNodesWithLinks();
         try {
-            createHistoricObjects();
+            createLandmarksObjects();
+            createJunctionObjects();
         } catch (IOException e) {
             e.printStackTrace();
         }
         }
-
-    public void loadTable() {
-        landmarksTable.getItems().clear();
-        landmarkColumn.setCellValueFactory(new PropertyValueFactory<Point, String>("type"));
-
-        for (int i = 0; i < landmarks.size()-1;i++) {
-            landmarksTable.getItems().add(landmarks.get(i).getData());
-        }
-            landmarksTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-    }
-
 
     public void startingLandmark(ActionEvent actionEvent) {
         coordStartLocator();
@@ -118,7 +108,7 @@ public class Controller implements Initializable {
         }
     }
 
-    public void createHistoricObjects() throws IOException {
+    public void createLandmarksObjects() throws IOException {
         String path = "WaterfordCityRoute/src/System/Coords.csv";
         FileReader file = new FileReader(path);
         BufferedReader csvReader = new BufferedReader(file);
@@ -129,26 +119,52 @@ public class Controller implements Initializable {
                 Point temp = new Point(values[0],Integer.parseInt(values[1]),Integer.parseInt(values[2]));
                 Node<Point> historicLandmark = new Node<>(temp);
                 //System.out.println(historicLandmark.data.getType());
-                addNodesToLandmarksList(historicLandmark);
+                landmarks.add(historicLandmark);
             } catch (Exception ignored) {
             }
         }
     }
 
-    // this is really scuffed but idk it works
-    public void addNodesToLandmarksList(Node<Point> historicLandmark) {
-//        int i=0;
-//        while(landmarks.get(i)!=null) {
-//            i++;
-//            if(i == landmarks.size()) {
-//                break;
-//            }
-//        }
-//        if(landmarks.g) {
-//            landmarks.set(i, historicLandmark);
-//        }
-        landmarks.add(historicLandmark);
+    public void createJunctionObjects() throws IOException {
+        String path = "WaterfordCityRoute/src/System/Junctions.csv";
+        FileReader file = new FileReader(path);
+        BufferedReader csvReader = new BufferedReader(file);
+        String line = "";
+        while ((line = csvReader.readLine()) !=null) {
+            try {
+                String[] values = line.split(",");
+                Point temp = new Point(values[0],Integer.parseInt(values[1]),Integer.parseInt(values[2]));
+                Node<Point> junction = new Node<>(temp);
+                //System.out.println(junction.data.getType());
+                junctions.add(junction);
+            } catch (Exception ignored) {
+            }
+        }
+        for(int i =0;i<junctions.size();i++) {
+            System.out.println(i + ": " + junctions.get(i).getData().getType());
+        }
+        showJunctions();
     }
+    public void showJunctions() throws IOException {
+        if(!junctions.isEmpty()) {
+                for (int i = 0; i < junctions.size(); i++) {
+                    //System.out.println(landmarks[i].data.getType());
+                    rec = new Rectangle(junctions.get(i).getData().getX(), junctions.get(i).getData().getY(), 5, 5);
+                    rec.setFill(Color.BLUE);
+                    //Hover over landmark
+                    rec.setX(junctions.get(i).getData().getX() - 2.5);
+                    rec.setY(junctions.get(i).getData().getY() - 2.5);
+                    rec.setWidth(3);
+                    rec.setHeight(3);
+                    rec.setLayoutX(mapDisplay.getLayoutX());
+                    rec.setLayoutY(mapDisplay.getLayoutY());
+                    ((AnchorPane) mapDisplay.getParent()).getChildren().add(rec);
+                    Tooltip.install(rec, new Tooltip(junctions.get(i).getData().getType()));
+                    //tils.landmarks[i]
+                } choiceBoxLandmarks();
+            } else {((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);}
+    }
+
 
     // Toggles Landmarks on and off
     public void showLandmarks() throws IOException {
@@ -171,8 +187,17 @@ public class Controller implements Initializable {
                     //tils.landmarks[i]
                 }
             }
-            choiceBoxLandmarks();
         } else {((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);}
+    }
+
+    //TODO: ADD CHECKBOXES TO THIS TABLE
+    public void loadTable() {
+        landmarksTable.getItems().clear();
+        landmarkColumn.setCellValueFactory(new PropertyValueFactory<Point, String>("type"));
+        for (int i = 0; i < landmarks.size()-1;i++) {
+            landmarksTable.getItems().add(landmarks.get(i).getData());
+        }
+        landmarksTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     public void choiceBoxLandmarks() {
@@ -198,6 +223,10 @@ public class Controller implements Initializable {
             }
         }
     }
+
+
+
+
     /**
      * FOR DJI ROUTING
      */
@@ -221,7 +250,7 @@ public class Controller implements Initializable {
     public void djiShortRoute() {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
-        connectAllNodes();
+        //connectAllHistoricNodes();
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
         //System.out.println(startNode + " " + endNode);
@@ -240,6 +269,11 @@ public class Controller implements Initializable {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
         connectAllHistoricNodes();
+        startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
+        endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
+
+        //CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, )
+
     }
 
     public void drawPath(List<Node<?>> pathList) {
@@ -265,29 +299,57 @@ public class Controller implements Initializable {
         }
     }
 
+    public void connectJunctions() {
+        //Connects peoples park to P1
+        landmarks.get(0).connectToNodeUndirected(junctions.get(0),Utils.getCostOfPath(landmarks.get(0), junctions.get(0)));
+        junctions.get(0).connectToNodeUndirected(junctions.get(1), Utils.getCostOfPath(junctions.get(0), junctions.get(1)));
+        junctions.get(0).connectToNodeUndirected(junctions.get(3), Utils.getCostOfPath(junctions.get(0), junctions.get(3)));
+        junctions.get(1).connectToNodeUndirected(junctions.get(2), Utils.getCostOfPath(junctions.get(1), junctions.get(2)));
+        junctions.get(2).connectToNodeUndirected(junctions.get(18), Utils.getCostOfPath(junctions.get(2), junctions.get(18)));
+        junctions.get(18).connectToNodeUndirected(junctions.get(17), Utils.getCostOfPath(junctions.get(18), junctions.get(17)));
+        //Connects P17 to Waterford Crystal (historic)
+        junctions.get(17).connectToNodeUndirected(historicLandmarks.get(1), Utils.getCostOfPath(junctions.get(17), historicLandmarks.get(1)));
+        junctions.get(17).connectToNodeUndirected(junctions.get(7), Utils.getCostOfPath(junctions.get(17), junctions.get(7)));
+        junctions.get(7).connectToNodeUndirected(junctions.get(4), Utils.getCostOfPath(junctions.get(7), junctions.get(4)));
+        junctions.get(4).connectToNodeUndirected(junctions.get(5), Utils.getCostOfPath(junctions.get(4), junctions.get(5)));
+        //Connects P5,7,17 to Reginalds Tower
+        junctions.get(5).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(5), historicLandmarks.get(0)));
+        junctions.get(7).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(7), historicLandmarks.get(0)));
+        junctions.get(17).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(17), historicLandmarks.get(0)));
+        junctions.get(3).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(3), historicLandmarks.get(0)));
+
+    }
+
+    // separates the historic nodes from the normal landmarks
     public void connectAllHistoricNodes() {
         historicLandmarks.removeAll(landmarks);
-        for(int i=0; i<= landmarks.size()-1;i++) {
+        for(int i = 0; i <= landmarks.size()-1; i++) {
             if (Arrays.stream(Utils.historic).anyMatch(landmarks.get(i).getData().getType()::contains)) {
                 historicLandmarks.add(landmarks.get(i));
             }
         }
-//        assert !historicLandmarks.isEmpty();
-        for(int j = 0; j < historicLandmarks.size()-1;j++) {
-            historicLandmarks.get(j).connectToNodeUndirected(historicLandmarks.get(j+1), Utils.getCostOfPath(historicLandmarks.get(j), historicLandmarks.get(j+1)));
-            //System.out.println(historicLandmarks.get(j).getData().getType() + " " + historicLandmarks.get(j+1).getData().getType());
-            System.out.println(historicLandmarks.get(j).getData().getType());
-        }
-
-    }
-
-    public void connectAllNodes() {
-        for(int i=0; i< landmarks.size()-1;i++) {
-            assert landmarks.get(i+1)!=null;
-            landmarks.get(i).connectToNodeUndirected(landmarks.get(i+1), Utils.getCostOfPath(landmarks.get(i), landmarks.get(i+1)));
-            //System.out.println(landmarks[i] + " " + landmarks[i+1]);
+        for(int j = 0; j < historicLandmarks.size();j++) {
+            System.out.println(j + ": " + historicLandmarks.get(j).getData().getType());
         }
     }
+
+//    public void connectAllNodes() {
+//        for(int i=0; i< landmarks.size()-1;i++) {
+//            assert landmarks.get(i+1)!=null;
+//            landmarks.get(i).connectToNodeUndirected(landmarks.get(i+1), Utils.getCostOfPath(landmarks.get(i), landmarks.get(i+1)));
+//            //System.out.println(landmarks[i] + " " + landmarks[i+1]);
+//        }
+//    }
+
+
+
+
+
+
+
+
+
+
 
 
     /***********
