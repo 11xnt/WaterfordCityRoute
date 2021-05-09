@@ -67,12 +67,25 @@ public class Utils {
 //        }
 //
 //        return cost;
-        int pathCost = (int)(java.lang.Math.sqrt(((endNode.getData().getX()-startNode.getData().getX())*(endNode.getData().getX() - startNode.getData().getX()))+
-                ((endNode.getData().getY() - startNode.getData().getY()) * (endNode.getData().getY() - startNode.getData().getY()))));
-
-        if(pathCost < 0) {
-            pathCost = pathCost*-1;
+//        int pathCost = (int)java.lang.Math.sqrt((
+//                endNode.getData().getX()-startNode.getData().getX())*(endNode.getData().getX() - startNode.getData().getX())+
+//                (endNode.getData().getY() - startNode.getData().getY() * (endNode.getData().getY() - startNode.getData().getY()) ) );
+        int x1,x2,y1,y2;
+        if(startNode.getData().getX() > endNode.getData().getX()) {
+            x1 = endNode.getData().getX();
+            y1 = endNode.getData().getY();
+            x2 = startNode.getData().getX();
+            y2 = startNode.getData().getY();
+        } else{
+            x1 = startNode.getData().getX();
+            y1 = startNode.getData().getY();
+            x2 = endNode.getData().getX();
+            y2 = endNode.getData().getY();
         }
+        int pathCost = (int)Math.sqrt(Math.pow(x2-x1,2) +
+                Math.pow(y2-y1,2));
+
+
         return pathCost;
 
     }
