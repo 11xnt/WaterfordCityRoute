@@ -50,11 +50,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<Pane prefHeight="752.0" prefWidth="1211.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
+<Pane prefHeight="741.0" prefWidth="1196.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
    <children>
-      <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="1201.0" style="-fx-background-color: #805AF9;">
+      <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="742.0" prefWidth="1196.0" style="-fx-background-color: #192844;">
          <children>
-            <ImageView fx:id="back" fitHeight="734.0" fitWidth="1214.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="back" fitHeight="734.0" fitWidth="1196.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
             <Button id="dark" fx:id="routeSearch" layoutX="553.0" layoutY="637.0" mnemonicParsing="false" onAction="#runSearch" prefHeight="44.0" prefWidth="127.0" text="Route Search" />
             <Button id="dark" fx:id="startBut" layoutX="414.0" layoutY="642.0" mnemonicParsing="false" onAction="#startingLandmark" text="Start Position" />
             <Button id="dark" layoutX="709.0" layoutY="642.0" mnemonicParsing="false" onAction="#destinationLandmark" text="Destination Button" />
@@ -71,12 +71,12 @@
             </VBox>
             <VBox layoutX="14.0" layoutY="39.0" prefHeight="373.0" prefWidth="203.0">
                <children>
-                  <Label text="Route Model">
+                  <Label text="Route Model" textFill="WHITE">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
                   </Label>
-                  <RadioButton fx:id="shortRadio" mnemonicParsing="false" text="Shortest Route">
+                  <RadioButton fx:id="shortRadio" mnemonicParsing="false" text="Shortest Route" textFill="WHITE">
                      <toggleGroup>
                         <ToggleGroup fx:id="RouteModelG" />
                      </toggleGroup>
@@ -84,7 +84,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </RadioButton>
-                  <RadioButton fx:id="hisRadio" mnemonicParsing="false" text="Historic Route" toggleGroup="$RouteModelG">
+                  <RadioButton fx:id="hisRadio" mnemonicParsing="false" text="Historic Route" textFill="WHITE" toggleGroup="$RouteModelG">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -94,12 +94,12 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </Line>
-                  <Label text="Route Method">
+                  <Label text="Route Method" textFill="WHITE">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
                   </Label>
-                  <RadioButton fx:id="djiRadio" mnemonicParsing="false" text="Djikstra">
+                  <RadioButton fx:id="djiRadio" mnemonicParsing="false" text="Djikstra" textFill="WHITE">
                      <toggleGroup>
                         <ToggleGroup fx:id="RouteMethodG" />
                      </toggleGroup>
@@ -107,7 +107,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </RadioButton>
-                  <RadioButton fx:id="bfsRadio" mnemonicParsing="false" text="BFS" toggleGroup="$RouteMethodG">
+                  <RadioButton fx:id="bfsRadio" mnemonicParsing="false" text="BFS" textFill="WHITE" toggleGroup="$RouteMethodG">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -117,7 +117,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </Line>
-                  <Label text="Choose landmarks points">
+                  <Label text="Choose landmarks points" textFill="WHITE">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -127,7 +127,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </Line>
-                  <Label text="Start">
+                  <Label text="Start" textFill="WHITE">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -137,7 +137,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </ChoiceBox>
-                  <Label text="Destination">
+                  <Label text="Destination" textFill="WHITE">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -152,7 +152,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </Line>
-                  <CheckBox fx:id="show" mnemonicParsing="false" onAction="#showLandmarks" text="Show Landmarks">
+                  <CheckBox fx:id="show" mnemonicParsing="false" onAction="#showLandmarks" text="Show Landmarks" textFill="WHITE">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -161,7 +161,7 @@
             </VBox>
          </children>
       </AnchorPane>
-      <MenuBar id="windows7" layoutX="-1.0" layoutY="1.0" prefHeight="25.0" prefWidth="1211.0">
+      <MenuBar id="windows7" layoutX="-1.0" layoutY="1.0" prefHeight="36.0" prefWidth="1196.0">
          <menus>
             <Menu mnemonicParsing="false" text="File">
                <items>
