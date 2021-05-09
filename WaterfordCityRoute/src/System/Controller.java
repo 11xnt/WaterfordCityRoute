@@ -56,7 +56,7 @@ public class Controller implements Initializable {
     private int height = (int) cityMap.getHeight();
 
     //background image
-    public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
+    //public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
     public Coordinate startCoord, endCoord;
     public Point startPoint, endPoint;
     Node<?> node;
@@ -71,7 +71,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        back.setImage(background);
+        //back.setImage(background);
         //nonChangedImage = cityMap;
         mapDisplay.setImage(cityMap);
         pixel = new int[width * height];
