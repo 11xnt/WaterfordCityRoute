@@ -42,9 +42,9 @@ public class Controller implements Initializable {
     @FXML
     ComboBox comboLandmark;
     @FXML
-    public TableView<Point> landmarksTable;
+    public TableView<Point> landmarksTable, landmarksAvoidTable;
     @FXML
-    public TableColumn<Point, String> landmarkColumn;
+    public TableColumn<Point, String> landmarkColumn, landmarkColumn1;
 
     static int[] pixel;
 
@@ -217,11 +217,15 @@ public class Controller implements Initializable {
     //TODO: ADD CHECKBOXES TO THIS TABLE
     public void loadTable() {
         landmarksTable.getItems().clear();
+        landmarksAvoidTable.getItems().clear();
         landmarkColumn.setCellValueFactory(new PropertyValueFactory<Point, String>("type"));
-        for (int i = 0; i < landmarks.size()-1;i++) {
+        landmarkColumn1.setCellValueFactory(new PropertyValueFactory<Point, String>("type"));
+        for (int i = 0; i < landmarks.size();i++) {
             landmarksTable.getItems().add(landmarks.get(i).getData());
+            landmarksAvoidTable.getItems().add(landmarks.get(i).getData());
         }
         landmarksTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        landmarksAvoidTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     public void choiceBoxLandmarks() {
@@ -295,6 +299,16 @@ public class Controller implements Initializable {
                 waypoint = matchingNode(landmarksTable.getSelectionModel().getSelectedItem().getType());
             }
         }
+        for(int j = 0; j < landmarks.size();j++) {
+            if (landmarksAvoidTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(j)))) {
+                for(int k = 0; k < landmarks.get(j).getAdjList().size(); k++) {
+                    //Node<?> tempLand = landmarks.get(j);
+                    landmarks.get(j).getAdjList().remove(k);
+                    //tempLand.getAdjList().get(tempLand.getAdjList().indexOf(tempDest)).setCost(Integer.MAX_VALUE);
+                }
+
+            }
+        }
         if(waypoint != null) {
             CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, waypoint.getData());
             CostedPath cpa1 = SearchLogic.findCheapestPathDijkstra(waypoint, endNode.getData());
@@ -333,6 +347,11 @@ public class Controller implements Initializable {
                 waypoint = matchingNode(landmarksTable.getSelectionModel().getSelectedItem().getType());
             }
         }
+        for(int j = 0; j < landmarks.size();j++) {
+            if (landmarksAvoidTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(j)))) {
+                encountered.add(landmarks.get(j).getData().getType());
+            }
+        }
         if(waypoint != null) {
             cpa1 = SearchLogic.findCheapestPathDijkstra(startNode, waypoint.getData());
             drawHistoricPath(cpa1.getPathList());
@@ -345,7 +364,6 @@ public class Controller implements Initializable {
             encountered.add(startNode.getData().getType());
             startNode = waypoint;
         } else {
-
             closestHistoric = findClosestHistoricLandmark(startNode);
             // creates the shortest path from that starting node to the closest historic node
             cpa1 = SearchLogic.findCheapestPathDijkstra(startNode, closestHistoric.getData());
@@ -425,6 +443,7 @@ public class Controller implements Initializable {
     }
 
     public void drawHistoricPath(List<Node<?>> pathList) {
+        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
             Node<Point> stPos = matchingHistoricNode(pathList.get(i));
@@ -443,6 +462,7 @@ public class Controller implements Initializable {
     }
 
     public void drawPath(List<Node<?>> pathList) {
+
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
             Node<Point> stPos = matchingAllNode(pathList.get(i));
