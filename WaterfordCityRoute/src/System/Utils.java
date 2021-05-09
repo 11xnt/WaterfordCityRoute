@@ -23,21 +23,21 @@ public class Utils {
                 image.getPixelReader(),
                 (int) image.getWidth(),
                 (int) image.getHeight());
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-        PixelReader pixelReader = writableImage.getPixelReader();
+    PixelWriter pixelWriter = writableImage.getPixelWriter();
+    PixelReader pixelReader = writableImage.getPixelReader();
         for (int i = 0; i < writableImage.getWidth(); i++) {
-            for (int j = 0; j < writableImage.getHeight(); j++) {
-                Color c = pixelReader.getColor(i, j);
-                double colourSum = c.getRed() + c.getBlue() + c.getGreen();
-                if (colourSum > threshold) {
-                    pixelWriter.setColor(i, j, Color.WHITE);
-                } else {
-                    pixelWriter.setColor(i, j, Color.BLACK);
-                }
+        for (int j = 0; j < writableImage.getHeight(); j++) {
+            Color c = pixelReader.getColor(i, j);
+            double colourSum = c.getRed() + c.getBlue() + c.getGreen();
+            if (colourSum > threshold) {
+                pixelWriter.setColor(i, j, Color.WHITE);
+            } else {
+                pixelWriter.setColor(i, j, Color.BLACK);
             }
         }
-        return writableImage;
     }
+        return writableImage;
+}
 
 
 

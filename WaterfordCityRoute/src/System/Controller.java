@@ -67,6 +67,7 @@ public class Controller implements Initializable {
     public List<Node<Point>> landmarks = new ArrayList<>();
     public List<Node<Point>> historicLandmarks = new ArrayList<>();
     public List<Node<Point>> junctions = new ArrayList<>();
+    public List<Node<Point>> allPoints = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -251,7 +252,6 @@ public class Controller implements Initializable {
     }
 
     public Node<Point> matchingAllNode(Node<?> node) {
-        List<Node<Point>> allPoints = new ArrayList<Node<Point>>();
         allPoints.addAll(landmarks);
         allPoints.addAll(historicLandmarks);
         allPoints.addAll(junctions);
@@ -286,24 +286,58 @@ public class Controller implements Initializable {
         Node<Point> startNode = null;
         Node<Point> endNode = null;
         Node<Point> closestHistoric;
+        Node<Point> after;
+        ArrayList<String> encounterd = new ArrayList<>();
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
-
+        if(startNode.getAdjList().isEmpty()) {
+            connectJunctions();
+        }
+        closestHistoric = findClosestHistoricLandmark(startNode);
+        encounterd.add(startNode.getData().getType());
         do {
-            closestHistoric = findClosestHistoricLandmark(startNode);
-            CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, closestHistoric.getData());
-            startNode = closestHistoric;
-        } while (closestHistoric == endNode);
-
-
+            // returns the closest historic landmark.
+            after = findClosestHistoricLandmark(closestHistoric);
+            // if startNode Type isn't in arraylist, create a path between them
+            if(!encounterd.toString().contains(after.getData().getType())) {
+                CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, closestHistoric.getData());
+                drawHistoricPath(cpa.getPathList());
+                // once path is created, add to the arraylist to it won't be encountered again
+                encounterd.add(closestHistoric.getData().getType());
+                // assign the closest historic as the start node
+            } closestHistoric.setData(after.getData());
+        } while (!closestHistoric.getAdjList().contains(endNode.getData()));
     }
 
     public Node<Point> findClosestHistoricLandmark(Node<Point> startNode) {
-        Node<Point> foundClosest;
-        for(int i = 0; i<historicLandmarks.size();i++) {
-            Utils.getCostOfPath(startNode,historicLandmarks.get(i));
+        Node<Point> foundClosest = null;
+        int temp = Integer.MAX_VALUE;
+        for(int i = 0; i < historicLandmarks.size(); i++) {
+            int temp2 = Utils.getCostOfPath(startNode,historicLandmarks.get(i));
+            if(temp2 < temp) {
+                temp = temp2;
+                foundClosest = historicLandmarks.get(i);
+            }
         }
-        return null;
+        return foundClosest;
+    }
+    public void drawHistoricPath(List<Node<?>> pathList) {
+        //((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
+        for(int i = 0; i < pathList.size()-1; i++) {
+            Line line1 = new Line();
+            Node<Point> stPos = matchingAllNode(pathList.get(i));
+            Node<Point> enPos = matchingAllNode(pathList.get(i+1));
+            line1.setStartX(stPos.getData().getX());
+            line1.setStartY(stPos.getData().getY());
+            line1.setEndX(enPos.getData().getX());
+            line1.setEndY(enPos.getData().getY());
+            line1.setLayoutX(mapDisplay.getLayoutX());
+            line1.setLayoutY(mapDisplay.getLayoutY());
+            ((AnchorPane) mapDisplay.getParent()).getChildren().add(line1);
+            line1.toBack();
+            mapDisplay.toBack();
+            back.toBack();
+        }
     }
 
     public void drawPath(List<Node<?>> pathList) {
@@ -331,7 +365,7 @@ public class Controller implements Initializable {
         junctions.get(0).connectToNodeUndirected(junctions.get(1), Utils.getCostOfPath(junctions.get(0), junctions.get(1)));
         junctions.get(0).connectToNodeUndirected(junctions.get(3), Utils.getCostOfPath(junctions.get(0), junctions.get(3)));
         junctions.get(1).connectToNodeUndirected(junctions.get(2), Utils.getCostOfPath(junctions.get(1), junctions.get(2)));
-        junctions.get(2).connectToNodeUndirected(junctions.get(18), Utils.getCostOfPath(junctions.get(2), junctions.get(18)));
+        junctions.get(2).connectToNodeUndirected(junctions.get(44), Utils.getCostOfPath(junctions.get(2), junctions.get(44)));
         junctions.get(18).connectToNodeUndirected(junctions.get(17), Utils.getCostOfPath(junctions.get(18), junctions.get(17)));
         //Connects P17 to Waterford Crystal (historic)
         junctions.get(17).connectToNodeUndirected(historicLandmarks.get(1), Utils.getCostOfPath(junctions.get(17), historicLandmarks.get(1)));
@@ -344,16 +378,13 @@ public class Controller implements Initializable {
         junctions.get(7).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(7), historicLandmarks.get(0)));
         junctions.get(17).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(17), historicLandmarks.get(0)));
         junctions.get(3).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(3), historicLandmarks.get(0)));
-        junctions.get(8).connectToNodeUndirected(junctions.get(5), Utils.getCostOfPath(junctions.get(8), junctions.get(5)));
         junctions.get(5).connectToNodeUndirected(junctions.get(17), Utils.getCostOfPath(junctions.get(5), junctions.get(17)));
         junctions.get(6).connectToNodeUndirected(junctions.get(8), Utils.getCostOfPath(junctions.get(6), junctions.get(8)));
         junctions.get(28).connectToNodeUndirected(junctions.get(6), Utils.getCostOfPath(junctions.get(7), junctions.get(4)));
-        junctions.get(40).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(40), historicLandmarks.get(0)));
         junctions.get(10).connectToNodeUndirected(historicLandmarks.get(4), Utils.getCostOfPath(junctions.get(10), historicLandmarks.get(4)));
         junctions.get(10).connectToNodeUndirected(junctions.get(11), Utils.getCostOfPath(junctions.get(10), junctions.get(11)));
         junctions.get(11).connectToNodeUndirected(junctions.get(12), Utils.getCostOfPath(junctions.get(11), junctions.get(12)));
         junctions.get(12).connectToNodeUndirected(junctions.get(13), Utils.getCostOfPath(junctions.get(12), junctions.get(13)));
-        junctions.get(13).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(13), historicLandmarks.get(0)));
         junctions.get(13).connectToNodeUndirected(junctions.get(14), Utils.getCostOfPath(junctions.get(13), junctions.get(14)));
         junctions.get(14).connectToNodeUndirected(junctions.get(34), Utils.getCostOfPath(junctions.get(14), junctions.get(34)));
         junctions.get(34).connectToNodeUndirected(junctions.get(35), Utils.getCostOfPath(junctions.get(34), junctions.get(35)));
@@ -373,21 +404,19 @@ public class Controller implements Initializable {
         junctions.get(39).connectToNodeUndirected(junctions.get(23), Utils.getCostOfPath(junctions.get(39), junctions.get(23)));
         junctions.get(23).connectToNodeUndirected(junctions.get(24), Utils.getCostOfPath(junctions.get(23), junctions.get(24)));
         junctions.get(24).connectToNodeUndirected(junctions.get(40), Utils.getCostOfPath(junctions.get(24), junctions.get(40)));
-        junctions.get(24).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(24), historicLandmarks.get(0)));
         junctions.get(23).connectToNodeUndirected(junctions.get(25), Utils.getCostOfPath(junctions.get(23), junctions.get(25)));
         junctions.get(25).connectToNodeUndirected(junctions.get(26), Utils.getCostOfPath(junctions.get(25), junctions.get(26)));
         junctions.get(26).connectToNodeUndirected(junctions.get(27), Utils.getCostOfPath(junctions.get(26), junctions.get(27)));
-        junctions.get(27).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(27), historicLandmarks.get(0)));
         junctions.get(26).connectToNodeUndirected(junctions.get(29), Utils.getCostOfPath(junctions.get(26), junctions.get(29)));
         junctions.get(27).connectToNodeUndirected(junctions.get(28), Utils.getCostOfPath(junctions.get(27), junctions.get(28)));
         junctions.get(8).connectToNodeUndirected(junctions.get(18), Utils.getCostOfPath(junctions.get(8), junctions.get(18)));
         junctions.get(18).connectToNodeUndirected(junctions.get(19), Utils.getCostOfPath(junctions.get(18), junctions.get(19)));
         junctions.get(19).connectToNodeUndirected(junctions.get(20), Utils.getCostOfPath(junctions.get(19), junctions.get(20)));
         junctions.get(20).connectToNodeUndirected(junctions.get(21), Utils.getCostOfPath(junctions.get(20), junctions.get(21)));
-        junctions.get(19).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(19), historicLandmarks.get(0)));
-        junctions.get(20).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(20), historicLandmarks.get(0)));
-        junctions.get(21).connectToNodeUndirected(historicLandmarks.get(0), Utils.getCostOfPath(junctions.get(21), historicLandmarks.get(0)));
         junctions.get(42).connectToNodeUndirected(junctions.get(4), Utils.getCostOfPath(junctions.get(42), junctions.get(4)));
+        junctions.get(21).connectToNodeUndirected(historicLandmarks.get(3), Utils.getCostOfPath(junctions.get(21),historicLandmarks.get(3)));
+        junctions.get(41).connectToNodeUndirected(historicLandmarks.get(4), Utils.getCostOfPath(junctions.get(42), historicLandmarks.get(4)));
+        junctions.get(44).connectToNodeUndirected(junctions.get(18), Utils.getCostOfPath(junctions.get(44), junctions.get(18)));
 
        // 5=wit,4=applemarket,2=waterforddis
         landmarks.get(5).connectToNodeUndirected(junctions.get(40), Utils.getCostOfPath(landmarks.get(5),junctions.get(40)));
