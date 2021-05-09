@@ -55,11 +55,11 @@
       <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="742.0" prefWidth="1196.0" style="-fx-background-color: #192844;">
          <children>
             <ImageView fx:id="back" fitHeight="734.0" fitWidth="1196.0" layoutY="8.0" pickOnBounds="true" preserveRatio="true" />
-            <Button id="dark" fx:id="routeSearch" layoutX="553.0" layoutY="637.0" mnemonicParsing="false" onAction="#runSearch" prefHeight="44.0" prefWidth="127.0" text="Route Search" />
-            <Button id="dark" fx:id="startBut" layoutX="414.0" layoutY="642.0" mnemonicParsing="false" onAction="#startingLandmark" text="Start Position" />
-            <Button id="dark" layoutX="709.0" layoutY="642.0" mnemonicParsing="false" onAction="#destinationLandmark" text="Destination Button" />
-            <ImageView fx:id="mapDisplay" fitHeight="580.0" fitWidth="944.0" layoutX="237.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true" />
-            <Button id="dark" layoutX="575.0" layoutY="687.0" mnemonicParsing="false" onAction="#updateComboBox" text="Refresh" />
+            <Button id="dark" fx:id="routeSearch" layoutX="642.0" layoutY="633.0" mnemonicParsing="false" onAction="#runSearch" prefWidth="150.0" text="Route Search" />
+            <Button id="dark" fx:id="startBut" layoutX="16.0" layoutY="633.0" mnemonicParsing="false" onAction="#startingLandmark" prefWidth="200.0" text="Start" />
+            <Button id="dark" layoutX="16.0" layoutY="677.0" mnemonicParsing="false" onAction="#destinationLandmark" prefWidth="200.0" text="Destination" />
+            <ImageView fx:id="mapDisplay" fitHeight="580.0" fitWidth="944.0" layoutX="245.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true" />
+            <Button id="dark" layoutX="642.0" layoutY="677.0" mnemonicParsing="false" onAction="#updateComboBox" prefWidth="150.0" text="Refresh" />
             <VBox layoutX="14.0" layoutY="413.0" prefHeight="207.0" prefWidth="203.0">
                <children>
                   <TableView fx:id="landmarksTable" prefHeight="220.0" prefWidth="203.0" style="-fx-background-color: #98C7E5;">
