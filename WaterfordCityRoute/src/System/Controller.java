@@ -365,7 +365,7 @@ public class Controller implements Initializable {
         junctions.get(0).connectToNodeUndirected(junctions.get(1), Utils.getCostOfPath(junctions.get(0), junctions.get(1)));
         junctions.get(0).connectToNodeUndirected(junctions.get(3), Utils.getCostOfPath(junctions.get(0), junctions.get(3)));
         junctions.get(1).connectToNodeUndirected(junctions.get(2), Utils.getCostOfPath(junctions.get(1), junctions.get(2)));
-        junctions.get(2).connectToNodeUndirected(junctions.get(44), Utils.getCostOfPath(junctions.get(2), junctions.get(44)));
+        junctions.get(2).connectToNodeUndirected(junctions.get(43), Utils.getCostOfPath(junctions.get(2), junctions.get(43)));
         junctions.get(18).connectToNodeUndirected(junctions.get(17), Utils.getCostOfPath(junctions.get(18), junctions.get(17)));
         //Connects P17 to Waterford Crystal (historic)
         junctions.get(17).connectToNodeUndirected(historicLandmarks.get(1), Utils.getCostOfPath(junctions.get(17), historicLandmarks.get(1)));
@@ -414,9 +414,11 @@ public class Controller implements Initializable {
         junctions.get(19).connectToNodeUndirected(junctions.get(20), Utils.getCostOfPath(junctions.get(19), junctions.get(20)));
         junctions.get(20).connectToNodeUndirected(junctions.get(21), Utils.getCostOfPath(junctions.get(20), junctions.get(21)));
         junctions.get(42).connectToNodeUndirected(junctions.get(4), Utils.getCostOfPath(junctions.get(42), junctions.get(4)));
+        junctions.get(42).connectToNodeUndirected(junctions.get(8), Utils.getCostOfPath(junctions.get(42), junctions.get(8)));
+        junctions.get(42).connectToNodeUndirected(junctions.get(41), Utils.getCostOfPath(junctions.get(42), junctions.get(41)));
         junctions.get(21).connectToNodeUndirected(historicLandmarks.get(3), Utils.getCostOfPath(junctions.get(21),historicLandmarks.get(3)));
         junctions.get(41).connectToNodeUndirected(historicLandmarks.get(4), Utils.getCostOfPath(junctions.get(42), historicLandmarks.get(4)));
-        junctions.get(44).connectToNodeUndirected(junctions.get(18), Utils.getCostOfPath(junctions.get(44), junctions.get(18)));
+        junctions.get(43).connectToNodeUndirected(junctions.get(18), Utils.getCostOfPath(junctions.get(43), junctions.get(18)));
 
        // 5=wit,4=applemarket,2=waterforddis
         landmarks.get(5).connectToNodeUndirected(junctions.get(40), Utils.getCostOfPath(landmarks.get(5),junctions.get(40)));
