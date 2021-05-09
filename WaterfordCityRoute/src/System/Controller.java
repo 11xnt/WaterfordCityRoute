@@ -26,7 +26,7 @@ import java.util.*;
 public class Controller implements Initializable {
 
     @FXML
-    public ImageView back, mapDisplay, startBimg, endBimg;
+    public ImageView back, mapDisplay, startBimg, endBimg, searchAnimation, refreshGif;
     @FXML
     public Button startBut;
     @FXML
@@ -59,6 +59,8 @@ public class Controller implements Initializable {
     //public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
     Image startImg = new Image("System/iconfinder_gpsmapicons07_68010.png",48,48,false,true);
     Image endImg = new Image("System/finish-line-flag.png",48,48,false,true);
+    Image searchAni = new Image("System/icons8-search.gif",48,48,false,true);
+    Image refreshAni = new Image("System/refresh.gif",48,48,false,true);
     public Coordinate startCoord, endCoord;
     public Point startPoint, endPoint;
     Node<?> node;
@@ -76,6 +78,8 @@ public class Controller implements Initializable {
         //back.setImage(background);
         //nonChangedImage = cityMap;
         startBimg.setImage(startImg);
+        searchAnimation.setImage(searchAni);
+        refreshGif.setImage(refreshAni);
         endBimg.setImage(endImg);
         mapDisplay.setImage(cityMap);
         pixel = new int[width * height];
