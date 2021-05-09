@@ -281,19 +281,37 @@ public class Controller implements Initializable {
     }
 
     public void djiShortRoute() {
+        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
         Node<Point> startNode = null;
         Node<Point> endNode = null;
+        Node<Point> waypoint = null;
         //connectAllHistoricNodes();
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
         //System.out.println(startNode + " " + endNode);
         //startNode.connectToNodeUndirected(endNode, Utils.getCostOfPath(startNode,endNode));
-        CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
-        for (Node<?> n : cpa.getPathList()){
-            System.out.println(n.getData());
+        for(int i = 0; i < landmarks.size();i++) {
+            if (landmarksTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(i)))) {
+                waypoint = matchingNode(landmarksTable.getSelectionModel().getSelectedItem().getType());
+            }
         }
-        drawPath(cpa.getPathList());
-        System.out.println("\nThe total path cost is: " + cpa.pathCost);
+        if(waypoint != null) {
+            CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, waypoint.getData());
+            CostedPath cpa1 = SearchLogic.findCheapestPathDijkstra(waypoint, endNode.getData());
+            for (Node<?> n : cpa.getPathList()) {
+                System.out.println(n.getData());
+            }
+            drawPath(cpa.getPathList());
+            drawPath(cpa1.getPathList());
+            System.out.println("\nThe total path cost is: " + cpa.pathCost);
+        } else {
+            CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
+            for (Node<?> n : cpa.getPathList()) {
+                System.out.println(n.getData());
+            }
+            drawPath(cpa.getPathList());
+            System.out.println("\nThe total path cost is: " + cpa.pathCost);
+        }
     }
 
     // finds the historic route and displays it
@@ -304,13 +322,30 @@ public class Controller implements Initializable {
         Node<Point> endNode;
         Node<Point> closestHistoric;
         Node<Point> after;
+        Node<Point> waypoint = null;
         CostedPath cpa = null,cpa1,cpa2 = null;
         startNode = matchingNode(startBox.getSelectionModel().getSelectedItem());
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
         // at the start we connect all the junctions together
             // if they are already connected, then start finding the historic route
+        for(int i = 0; i < landmarks.size();i++) {
+            if (landmarksTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(i)))) {
+                waypoint = matchingNode(landmarksTable.getSelectionModel().getSelectedItem().getType());
+            }
+        }
+        if(waypoint != null) {
+            cpa1 = SearchLogic.findCheapestPathDijkstra(startNode, waypoint.getData());
+            drawHistoricPath(cpa1.getPathList());
+            System.out.println("first");
+            for (Node<?> n : cpa1.getPathList()){
+                System.out.println(n.getData() + "->" + matchingAllNode(n).getData().getType());
+            }
+            //cpa.getPathList().add(cpa1.getPathList().);
+            // adds the starting node to the encountered so it will not travel back to it again
+            encountered.add(startNode.getData().getType());
+            startNode = waypoint;
+        } else {
 
-            // returns the closest historic landmark from the starting node once.
             closestHistoric = findClosestHistoricLandmark(startNode);
             // creates the shortest path from that starting node to the closest historic node
             cpa1 = SearchLogic.findCheapestPathDijkstra(startNode, closestHistoric.getData());
@@ -325,7 +360,14 @@ public class Controller implements Initializable {
             encountered.add(startNode.getData().getType());
             startNode = closestHistoric;
 
-            while (closestHistoric!=null){
+        }
+
+            // returns the closest historic landmark from the starting node once.
+            //closestHistoric = findClosestHistoricLandmark(startNode);
+            // creates the shortest path from that starting node to the closest historic node
+            // draws the shortest path
+
+            while (startNode != null) {
                 // if the next historic node isn't null (end, continue on creating a path
                 if (findClosestHistoricLandmark(startNode) != null) {
                     //cpa2 = null;
@@ -335,7 +377,7 @@ public class Controller implements Initializable {
                     cpa2 = SearchLogic.findCheapestPathDijkstra(startNode, closestHistoric.getData());
                     drawHistoricPath(cpa2.getPathList());
                     System.out.println("Inbetween nodes");
-                    for (Node<?> n : cpa2.getPathList()){
+                    for (Node<?> n : cpa2.getPathList()) {
                         System.out.println(n.getData() + "->" + matchingAllNode(n).getData().getType());
                     }
                     // adds the historic node to the encountered so it will not travel back to it again
@@ -344,18 +386,19 @@ public class Controller implements Initializable {
                     // assign the after node as the historic node
                     startNode = closestHistoric;
                 }
-                if(findClosestHistoricLandmark(startNode) == null) {
+                if (findClosestHistoricLandmark(startNode) == null) {
                     // once all nodes have been reached, find the cheapest path from the node to the end/destination node
                     cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
                     drawHistoricPath(cpa.getPathList());
                     System.out.println("last");
-                    for (Node<?> n : cpa.getPathList()){
+                    for (Node<?> n : cpa.getPathList()) {
                         System.out.println(n.getData() + "->" + matchingAllNode(n).getData().getType());
                     }
                     // after last path is drawn, break the loop
                     break;
                 }
             }
+
 
     }
 
@@ -380,8 +423,8 @@ public class Controller implements Initializable {
         foundClosest = temp3;
         return foundClosest;
     }
+
     public void drawHistoricPath(List<Node<?>> pathList) {
-        //((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
             Node<Point> stPos = matchingHistoricNode(pathList.get(i));
@@ -400,7 +443,6 @@ public class Controller implements Initializable {
     }
 
     public void drawPath(List<Node<?>> pathList) {
-        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
             Node<Point> stPos = matchingAllNode(pathList.get(i));
@@ -463,11 +505,6 @@ public class Controller implements Initializable {
         //junctions.get(10).connectToNodeUndirected(historicLandmarks.get(4), Utils.getCostOfPath(junctions.get(10), historicLandmarks.get(4)));
         historicLandmarks.get(4).connectToNodeUndirected(junctions.get(41), Utils.getCostOfPath(historicLandmarks.get(4), junctions.get(41)));
         historicLandmarks.get(4).connectToNodeUndirected(junctions.get(10), Utils.getCostOfPath(historicLandmarks.get(4), junctions.get(10)));
-        System.out.println("Index of "+ historicLandmarks.get(4)+ ": " + historicLandmarks.get(4).getData().getType());
-        System.out.println("Index of "+ junctions.indexOf(41)+ ": " + junctions.get(41).getData().getType());
-        System.out.println("Index of "+ historicLandmarks.get(4)+ ": " + historicLandmarks.get(4).getData().getType());
-        System.out.println("Index of "+ junctions.indexOf(10)+ ": " + junctions.get(10).getData().getType());
-
         landmarks.get(8).connectToNodeUndirected(junctions.get(41), Utils.getCostOfPath(landmarks.get(8), junctions.get(41)));
         landmarks.get(8).connectToNodeUndirected(junctions.get(10), Utils.getCostOfPath(landmarks.get(8), junctions.get(10)));
 
