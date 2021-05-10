@@ -18,11 +18,6 @@ class NodeTest {
     }
 
     @Test
-    void connectToNodeDirected() {
-
-    }
-
-    @Test
     void connectNodeDirectedTest() {
         nodeA.connectToNodeDirected(nodeB, 100);
 
