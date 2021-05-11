@@ -20,6 +20,8 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.*;
 
+import static java.lang.Integer.parseInt;
+
 
 public class Controller implements Initializable {
 
@@ -36,7 +38,7 @@ public class Controller implements Initializable {
     @FXML
     Rectangle rec;
     @FXML
-    RadioButton bfsRadio, djiRadio, hisRadio, shortRadio;
+    RadioButton bfsRadio, djiRadio, hisRadio, shortRadio, dfsRadio;
     @FXML
     ComboBox comboLandmark;
     @FXML
@@ -116,8 +118,8 @@ public class Controller implements Initializable {
         if(bfsRadio.isSelected() && shortRadio.isSelected()) {
             bfsShortRoute();
         }
-        else if(bfsRadio.isSelected() && shortRadio.isSelected()) {
-            //bfsRoute();
+        else if(dfsRadio.isSelected() && shortRadio.isSelected()) {
+            dfsRoute();
         }
         else if(djiRadio.isSelected() && shortRadio.isSelected()) {
             djiShortRoute();
@@ -126,7 +128,6 @@ public class Controller implements Initializable {
             djiHistRoute();
         }
     }
-
     public void createLandmarksObjects() throws IOException {
         String path = "WaterfordCityRoute/src/System/Coords.csv";
         FileReader file = new FileReader(path);
@@ -135,7 +136,7 @@ public class Controller implements Initializable {
         while ((line = csvReader.readLine()) !=null) {
             try {
                 String[] values = line.split(",");
-                Point temp = new Point(values[0],Integer.parseInt(values[1]),Integer.parseInt(values[2]));
+                Point temp = new Point(values[0], parseInt(values[1]), parseInt(values[2]));
                 Node<Point> historicLandmark = new Node<>(temp);
                 //System.out.println(historicLandmark.data.getType());
                 landmarks.add(historicLandmark);
@@ -156,7 +157,7 @@ public class Controller implements Initializable {
         while ((line = csvReader.readLine()) !=null) {
             try {
                 String[] values = line.split(",");
-                Point temp = new Point(values[0],Integer.parseInt(values[1]),Integer.parseInt(values[2]));
+                Point temp = new Point(values[0], parseInt(values[1]), parseInt(values[2]));
                 Node<Point> junction = new Node<>(temp);
                 junctions.add(junction);
             } catch (Exception ignored) {
@@ -303,38 +304,40 @@ public class Controller implements Initializable {
         endNode = matchingNode(destinationBox.getSelectionModel().getSelectedItem());
         //System.out.println(startNode + " " + endNode);
         //startNode.connectToNodeUndirected(endNode, Utils.getCostOfPath(startNode,endNode));
-        for(int i = 0; i < landmarks.size();i++) {
-            if (landmarksTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(i)))) {
-                waypoint = matchingNode(landmarksTable.getSelectionModel().getSelectedItem().getType());
-            }
-        }
-        for(int j = 0; j < landmarks.size();j++) {
-            if (landmarksAvoidTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(j)))) {
-                for(int k = 0; k < landmarks.get(j).getAdjList().size(); k++) {
-                    //Node<?> tempLand = landmarks.get(j);
-                    landmarks.get(j).getAdjList().remove(k);
-                    //tempLand.getAdjList().get(tempLand.getAdjList().indexOf(tempDest)).setCost(Integer.MAX_VALUE);
+            // finds the landmark is must go to
+            for (int i = 0; i < landmarks.size(); i++) {
+                if (landmarksTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(i)))) {
+                    waypoint = matchingNode(landmarksTable.getSelectionModel().getSelectedItem().getType());
                 }
+            }
+            // finds the landmark to not visit
+            for (int j = 0; j < landmarks.size(); j++) {
+                if (landmarksAvoidTable.getSelectionModel().isSelected(landmarks.indexOf(landmarks.get(j)))) {
+                    for (int k = 0; k < landmarks.get(j).getAdjList().size(); k++) {
+                        //Node<?> tempLand = landmarks.get(j);
+                        landmarks.get(j).getAdjList().remove(k);
+                        //tempLand.getAdjList().get(tempLand.getAdjList().indexOf(tempDest)).setCost(Integer.MAX_VALUE);
+                    }
+                }
+            }
+            if (waypoint != null) {
+                CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, waypoint.getData());
+                CostedPath cpa1 = SearchLogic.findCheapestPathDijkstra(waypoint, endNode.getData());
+                for (Node<?> n : cpa.getPathList()) {
+                    System.out.println(n.getData());
+                }
+                drawPath(cpa.getPathList());
+                drawPath(cpa1.getPathList());
+                System.out.println("\nThe total path cost is: " + cpa.pathCost);
+            } else {
+                CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
+                for (Node<?> n : cpa.getPathList()) {
+                    System.out.println(n.getData());
+                }
+                drawPath(cpa.getPathList());
+                System.out.println("\nThe total path cost is: " + cpa.pathCost);
+            }
 
-            }
-        }
-        if(waypoint != null) {
-            CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, waypoint.getData());
-            CostedPath cpa1 = SearchLogic.findCheapestPathDijkstra(waypoint, endNode.getData());
-            for (Node<?> n : cpa.getPathList()) {
-                System.out.println(n.getData());
-            }
-            drawPath(cpa.getPathList());
-            drawPath(cpa1.getPathList());
-            System.out.println("\nThe total path cost is: " + cpa.pathCost);
-        } else {
-            CostedPath cpa = SearchLogic.findCheapestPathDijkstra(startNode, endNode.getData());
-            for (Node<?> n : cpa.getPathList()) {
-                System.out.println(n.getData());
-            }
-            drawPath(cpa.getPathList());
-            System.out.println("\nThe total path cost is: " + cpa.pathCost);
-        }
     }
 
     // finds the historic route and displays it
@@ -722,22 +725,13 @@ public class Controller implements Initializable {
         int currentPixel;
         // adds the starting pixel to the start of the BFS to begin the search
         imageAgendaArray.add(startPixel);
-
         // sets the starting pixel to a value of 1
         imageArray[imageLocationArray.get(0)] = 1;
-        //Integer left, right= 0, up= 0, down= 0;
-        //Integer left, right, up, down;
+
         while (imageLocationArray.get(0)-1 != imageLocationArray.get(1) || imageLocationArray.get(0)+1 != imageLocationArray.get(1) || imageLocationArray.get(0)+(int)mapDisplay.getImage().getWidth() != imageLocationArray.get(1) || imageLocationArray.get(0)-(int)mapDisplay.getImage().getWidth() != imageLocationArray.get(1)) {
             //Integer left = 0, right= 0, up= 0, down= 0;
             // gets the first pixel in queue (in the agenda) and searched all possible routes around that
-            //TODO
             currentPixel = imageAgendaArray.get(0);
-            // directions surrounding the pixel
-//            if(currentPixel+1 < imageArray.length-1) right = imageArray[currentPixel+1];
-//            if(currentPixel-1 < 0) left = imageArray[currentPixel-1];
-//            if(currentPixel+(int)mapDisplay.getImage().getWidth() < imageArray.length-1) down = imageArray[currentPixel+(int)mapDisplay.getImage().getWidth()];
-//            if(currentPixel-(int)mapDisplay.getImage().getWidth() >= 0) up = imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()];
-//            // removes the pixel being dealt with from the agenda array
             imageAgendaArray.remove(0);
 
             int currentCost = imageArray[currentPixel];
@@ -745,60 +739,29 @@ public class Controller implements Initializable {
             // checks if all directions are possible
             // checks if right is possible
             if(imageArray[currentPixel+1] == 0 && currentPixel+1 < imageArray.length-1) {
-               // if (imageArray[currentPixel + 1] < imageArray.length && imageArray[currentPixel + 1] == 0) {
-                    //right = imageArray[currentPixel+1];
                 imageAgendaArray.add(currentPixel+1);
                 imageArray[currentPixel+1] = currentCost+1;
 
             }
             // checks if left is possible
             if(imageArray[currentPixel-1] == 0 && currentPixel-1 >= 0) {
-               // if (imageArray[currentPixel - 1] < imageArray.length && imageArray[currentPixel - 1] == 0) {
-                    //left = imageArray[currentPixel - 1];
-                    imageAgendaArray.add(currentPixel-1);
+                imageAgendaArray.add(currentPixel-1);
                 imageArray[currentPixel-1] = currentCost+1;
 
             }
             // checks if down is possible
             if(((currentPixel+(int)mapDisplay.getImage().getWidth()) < imageArray.length-1) && (imageArray[currentPixel+(int)mapDisplay.getImage().getWidth()] == 0)) {
-                    //if (imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()] < imageArray.length && imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()] == 0) {
-                    //down = imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()];
                 imageAgendaArray.add(currentPixel + (int) mapDisplay.getImage().getWidth());
                 imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()] = currentCost + 1;
             }
 
             // checks if up is possible
             if((currentPixel-(int)mapDisplay.getImage().getWidth()) >= 0 && (imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()] == 0)) {
-                //if (imageArray[currentPixel - (int) mapDisplay.getImage().getWidth()] < imageArray.length && imageArray[currentPixel - (int) mapDisplay.getImage().getWidth()] == 0) {
-                    //up = imageArray[currentPixel - (int) mapDisplay.getImage().getWidth()];
                 imageAgendaArray.add(currentPixel-(int)mapDisplay.getImage().getWidth());
                 imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()] = currentCost+1;
 
             }
 
-            // checks if all directions have either white or not white pixels.
-//
-//                // if down is white set it to V+1 and add to imageAgenda
-//                if (down == 0) {
-//                    imageArray[down] = currentPixel+1;
-//                    imageAgendaArray.add(imageArray[down]);
-//                }
-//                // if right is white set it to V+1 and add to imageAgenda
-//                if (right == 0) {
-//                    imageArray[right] = currentPixel+1;
-//                    imageAgendaArray.add(imageArray[right]);
-//                }
-//                // if up is white set it to V+1 and add to imageAgenda
-//                if (up == 0) {
-//                    imageArray[up] = currentPixel+1;
-//                    imageAgendaArray.add(imageArray[up]);
-//                }
-//                // if left is white set it to V+1 and add to imageAgenda
-//                if (left == 0) {
-//                    imageArray[left] = currentPixel+1;
-//                    imageAgendaArray.add(imageArray[left]);
-//                }
-//            }
             if(currentPixel==endPixel) {
                 buildPath(); // sends the indexes to build the path
                 break;
@@ -900,4 +863,46 @@ public class Controller implements Initializable {
         mapDisplay.setImage(outputImage);
     }
 
+    public void dfsRoute() {
+        imageAgendaArray = new ArrayList<>();
+        imageLocationArray = new ArrayList<>();
+        imageLocationArray.add(((startCoord.getY()*(int)mapDisplay.getImage().getWidth())+startCoord.getX()));
+        imageLocationArray.add(((endCoord.getY()*(int)mapDisplay.getImage().getWidth())+endCoord.getX()));
+        ArrayList<Integer> encounteredDFS = new ArrayList<>();
+        //process through the imageArray length
+        int startPixel = imageLocationArray.get(0); // gets the position of the start node in the imageArray
+        int endPixel = imageLocationArray.get(1);   // gets the position of the end node in the imageArray
+        int currentPixel;
+        int amountOfRoutes;
+        // adds the starting pixel to the start of the BFS to begin the search
+        imageAgendaArray.add(startPixel);
+        // sets the starting pixel to a value of 1
+        imageArray[imageLocationArray.get(0)] = 1;
+
+//        if(numOfRoutes.getText().isEmpty()) {
+//            amountOfRoutes = 1;
+//        } else {
+//            amountOfRoutes = parseInt(numOfRoutes.getText());
+//        }
+        ArrayList<ArrayList<Integer>> idk = SearchLogic.findAllPathsDepthFirst(startPixel, imageArray, endPixel);
+        drawDFS(idk);
+        }
+
+        public void drawDFS(ArrayList<ArrayList<Integer>> idk) {
+            PixelReader pixelReader = mapDisplay.getImage().getPixelReader();
+            WritableImage outputImage = new WritableImage((int)mapDisplay.getImage().getWidth(), (int) mapDisplay.getImage().getHeight());
+
+            PixelWriter writer = outputImage.getPixelWriter();
+
+            for(ArrayList<Integer> idk2 : idk) {
+
+            }
+
+
+        }
+
+
+
 }
+
+

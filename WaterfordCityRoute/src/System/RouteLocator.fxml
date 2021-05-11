@@ -142,6 +142,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </RadioButton>
+                  <RadioButton fx:id="dfsRadio" mnemonicParsing="false" text="DFS" textFill="WHITE" toggleGroup="$RouteMethodG" />
                   <RadioButton fx:id="bfsRadio" mnemonicParsing="false" onAction="#bfsRadio" text="BFS" textFill="WHITE" toggleGroup="$RouteMethodG">
                      <VBox.margin>
                         <Insets top="8.0" />
