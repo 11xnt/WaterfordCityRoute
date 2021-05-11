@@ -43,6 +43,7 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -51,7 +52,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<Pane prefHeight="741.0" prefWidth="1196.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
+<Pane prefHeight="741.0" prefWidth="1196.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="System.Controller">
    <children>
       <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="742.0" prefWidth="1196.0" style="-fx-background-color: #192844;">
          <children>
@@ -80,7 +81,7 @@
                      </image>
                   </ImageView>
                </graphic></Button>
-            <ImageView fx:id="mapDisplay" fitHeight="580.0" fitWidth="944.0" layoutX="265.0" layoutY="40.0" opacity="0.55" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="mapDisplay" fitHeight="580.0" fitWidth="944.0" layoutX="265.0" layoutY="40.0" pickOnBounds="true" preserveRatio="true" />
             <Button id="dark" layoutX="642.0" layoutY="677.0" mnemonicParsing="false" onAction="#updateComboBox" prefWidth="150.0" text="           Refresh">
                <graphic>
                   <ImageView fx:id="refreshGif" fitHeight="20.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
@@ -141,7 +142,7 @@
                         <Insets top="8.0" />
                      </VBox.margin>
                   </RadioButton>
-                  <RadioButton fx:id="bfsRadio" mnemonicParsing="false" text="BFS" textFill="WHITE" toggleGroup="$RouteMethodG">
+                  <RadioButton fx:id="bfsRadio" mnemonicParsing="false" onAction="#bfsRadio" text="BFS" textFill="WHITE" toggleGroup="$RouteMethodG">
                      <VBox.margin>
                         <Insets top="8.0" />
                      </VBox.margin>
@@ -193,6 +194,8 @@
                   </CheckBox>
                </children>
             </VBox>
+            <TextField fx:id="numOfRoutes" alignment="CENTER" layoutX="320.0" layoutY="687.0" style="-fx-background-color: #276279;" />
+            <Label layoutX="347.0" layoutY="663.0" text="How many routes" textFill="WHITE" />
          </children>
       </AnchorPane>
       <MenuBar id="windows7" layoutX="-1.0" layoutY="1.0" prefHeight="36.0" prefWidth="1196.0">

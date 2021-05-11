@@ -6,9 +6,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelReader;
+import javafx.scene.image.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -45,15 +43,17 @@ public class Controller implements Initializable {
     public TableView<Point> landmarksTable, landmarksAvoidTable;
     @FXML
     public TableColumn<Point, String> landmarkColumn, landmarkColumn1;
+    @FXML
+    TextField numOfRoutes;
 
     static int[] pixel;
 
     //Waterford Map
     Image cityMap = new Image("System//Waterford.png".toString(),944,580,false,true);
-    static Image nonChangedImage;
+    Image nonChangedImage = cityMap;
 
-    private int width = (int) cityMap.getWidth();
-    private int height = (int) cityMap.getHeight();
+    public int width;
+    public int height;
 
     //background image
     //public Image background = new Image("https://res.cloudinary.com/dmepo58r1/image/upload/v1617879106/white-elegant-texture-background-theme_23-2148415644_iymdok.jpg", 1200, 752, false, true);
@@ -66,13 +66,16 @@ public class Controller implements Initializable {
     Node<?> node;
     Link link;
     public Node<Point> foundStart, foundEnd;
-    public Node<Point>[] imageArray = new Node[width*height];
+
+    public ArrayList<Integer> imageAgendaArray;
+    public ArrayList<Integer> imageLocationArray;
 
     public List<Node<Point>> landmarks = new ArrayList<>();
     public List<Node<Point>> historicLandmarks = new ArrayList<>();
     public List<Node<Point>> junctions = new ArrayList<>();
     public List<Node<Point>> allPoints = new ArrayList<>();
     public ArrayList<String> encountered = new ArrayList<>();
+    public int[] imageArray;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -83,18 +86,24 @@ public class Controller implements Initializable {
         refreshGif.setImage(refreshAni);
         endBimg.setImage(endImg);
         mapDisplay.setImage(cityMap);
-        pixel = new int[width * height];
-        establishNodesOnMap();
-        connectNodesWithLinks();
+        //pixel = new int[width * height];
+        int width = (int)cityMap.getWidth();
+        int height = (int)mapDisplay.getImage().getHeight();
+        imageArray = new int[(int)mapDisplay.getImage().getWidth()*(int)mapDisplay.getImage().getHeight()];
+        imageLocationArray = new ArrayList<>();
+        //connectNodesWithLinks();
         try {
             createLandmarksObjects();
             createJunctionObjects();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        establishNodesOnMap();
         }
 
     public void startingLandmark(ActionEvent actionEvent) {
+        imageLocationArray = new ArrayList<>();
+        mapDisplay.setOnMousePressed(null);
         coordStartLocator();
     }
 
@@ -105,10 +114,10 @@ public class Controller implements Initializable {
 
     public void runSearch(ActionEvent actionEvent) {
         if(bfsRadio.isSelected() && shortRadio.isSelected()) {
-            bfsRoute();
+            bfsShortRoute();
         }
         else if(bfsRadio.isSelected() && shortRadio.isSelected()) {
-            bfsRoute();
+            //bfsRoute();
         }
         else if(djiRadio.isSelected() && shortRadio.isSelected()) {
             djiShortRoute();
@@ -156,6 +165,7 @@ public class Controller implements Initializable {
         for(int i =0;i<junctions.size();i++) {
             System.out.println(i + ": " + junctions.get(i).getData().getType());
         }
+        choiceBoxLandmarks();
         showJunctions();
     }
     public void showJunctions() throws IOException {
@@ -214,7 +224,6 @@ public class Controller implements Initializable {
         } else {((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);}
     }
 
-    //TODO: ADD CHECKBOXES TO THIS TABLE
     public void loadTable() {
         landmarksTable.getItems().clear();
         landmarksAvoidTable.getItems().clear();
@@ -239,6 +248,9 @@ public class Controller implements Initializable {
     }
 
     public void updateComboBox(ActionEvent event) {
+        ((AnchorPane)mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Circle);
+        ((AnchorPane)mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);
+        imageLocationArray.clear();
         comboLandmark.getItems().clear();
         Node<Point> landmark;
         int j = 0;
@@ -251,9 +263,6 @@ public class Controller implements Initializable {
             }
         }
     }
-
-
-
 
     /**
      * FOR DJI ROUTING
@@ -443,7 +452,6 @@ public class Controller implements Initializable {
     }
 
     public void drawHistoricPath(List<Node<?>> pathList) {
-        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Line);
         for(int i = 0; i < pathList.size()-1; i++) {
             Line line1 = new Line();
             Node<Point> stPos = matchingHistoricNode(pathList.get(i));
@@ -528,9 +536,6 @@ public class Controller implements Initializable {
         landmarks.get(8).connectToNodeUndirected(junctions.get(41), Utils.getCostOfPath(landmarks.get(8), junctions.get(41)));
         landmarks.get(8).connectToNodeUndirected(junctions.get(10), Utils.getCostOfPath(landmarks.get(8), junctions.get(10)));
 
-        junctions.get(9).connectToNodeUndirected(junctions.get(41), Utils.getCostOfPath(junctions.get(9), junctions.get(41)));
-        junctions.get(9).connectToNodeUndirected(junctions.get(10), Utils.getCostOfPath(junctions.get(9), junctions.get(10)));
-        junctions.get(9).connectToNodeUndirected(historicLandmarks.get(4), Utils.getCostOfPath(junctions.get(9), historicLandmarks.get(4)));
         junctions.get(6).connectToNodeUndirected(junctions.get(8), Utils.getCostOfPath(junctions.get(6), junctions.get(8)));
         junctions.get(6).connectToNodeUndirected(junctions.get(41), Utils.getCostOfPath(junctions.get(6), junctions.get(41)));
         junctions.get(28).connectToNodeUndirected(junctions.get(6), Utils.getCostOfPath(junctions.get(28), junctions.get(6)));
@@ -581,10 +586,6 @@ public class Controller implements Initializable {
         for (int i = 0; i < allPoints.size(); i++) {
             System.out.println(i + ": " + allPoints.get(i).getData().getType());
         }
-
-
-
-
     }
 
     // separates the historic nodes from the normal landmarks
@@ -608,64 +609,68 @@ public class Controller implements Initializable {
 //        }
 //    }
 
-
-
-
-
-
-
-
-
-
-
-
     /***********
      * for BFS *
      ***********/
 
+    public void bfsRadio(ActionEvent event) {
+        //imageLocationArray = null;
+
+    }
+
+
     public void coordStartLocator() {
         mapDisplay.setOnMousePressed(e -> {
             startCoord = new Coordinate((int)e.getX(),(int)e.getY());
+            //startLandmark(startCoord);
+            if(startCoord.getX() != 0 || startCoord.getY() != 0) {
+                if(imageArray[(startCoord.getY() * (int) mapDisplay.getImage().getWidth()) + startCoord.getX()] != -1) {
+                    //imageArray[(startCoord.getY() * (int) mapDisplay.getImage().getWidth()) + startCoord.getX()] = 1;
+                    //imageLocationArray.add(((startCoord.getY()*(int)mapDisplay.getImage().getWidth())+startCoord.getX()));
+                    startLandmark(startCoord);
+                }
+            }
         });
-
-        if(startCoord!=null) {
-            Node<Point> temp = searchForStartingMatchingPoint(imageArray);
-            startLandmark(temp);
-        }
     }
 
     public void coordEndLocator() {
         mapDisplay.setOnMousePressed(e -> {
             endCoord = new Coordinate((int)e.getX(),(int)e.getY());
+            if(endCoord.getX() != 0 || endCoord.getY() != 0) {
+                // gets the end array position
+                if(imageArray[(endCoord.getY() * (int) mapDisplay.getImage().getWidth()) + endCoord.getX()] != -1) {
+                   //imageArray[(endCoord.getY() * (int) mapDisplay.getImage().getWidth()) + endCoord.getX()] = 1;
+                    imageLocationArray.add(((endCoord.getY() * (int) mapDisplay.getImage().getWidth()) + endCoord.getX()));
+                    endLandmark(endCoord);
+                }
+            }
         });
-        if(endCoord!=null) {
-            Node<Point> temp = searchForEndingMatchingPoint(imageArray);
-            endLandmark(temp);
+    }
+
+
+    public void startLandmark(Coordinate startCoord) {
+        // ((AnchorPane)mapDisplay.getParent()).getChildren().removeAll(circle);
+        //coordStartLocator();
+        if(startCoord != null) {
+            Circle circle = new Circle();
+            //startPoint = new Point("start", startCoord.getX(), startCoord.getY());
+            circle.setCenterX(startCoord.getX());
+            circle.setCenterY(startCoord.getY());
+            circle.setRadius(5);
+            circle.setFill(Color.RED);
+            circle.setLayoutX(mapDisplay.getLayoutX());
+            circle.setLayoutY(mapDisplay.getLayoutY());
+            ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Circle);
+            ((AnchorPane) mapDisplay.getParent()).getChildren().add(circle);
+            circle.toFront();
         }
     }
 
-
-    public void startLandmark(Node<Point> foundStart) {
-        // ((AnchorPane)mapDisplay.getParent()).getChildren().removeAll(circle);
-        //coordStartLocator();
-        Circle circle = new Circle();
-        //startPoint = new Point("start", startCoord.getX(), startCoord.getY());
-        circle.setCenterX(foundStart.data.getX());
-        circle.setCenterY(foundStart.data.getY());
-        circle.setRadius(5);
-        circle.setFill(Color.RED);
-        circle.setLayoutX(mapDisplay.getLayoutX());
-        circle.setLayoutY(mapDisplay.getLayoutY());
-        ((AnchorPane) mapDisplay.getParent()).getChildren().removeIf(f -> f instanceof Circle);
-        ((AnchorPane) mapDisplay.getParent()).getChildren().add(circle);
-
-    }
-
-    private void endLandmark(Node<Point> foundEnd) {
+    private void endLandmark(Coordinate endCoord) {
         //coordEndLocator();
         if(endCoord != null) {
             Rectangle rect = new Rectangle();
-            endPoint = new Point("end", endCoord.getX(), endCoord.getY());
+            //endPoint = new Point("end", endCoord.getX(), endCoord.getY());
             rect.setX(endCoord.getX() - 2.5);
             rect.setY(endCoord.getY() - 2.5);
             rect.setWidth(10);
@@ -679,81 +684,220 @@ public class Controller implements Initializable {
     }
 
 
+    public void bfsShortRoute() {
+        connectNodesWithLinks();
+        //
+
+    }
+
     // scans through all pixels on the map, if the pixel is not white then its not made a node.
     public void establishNodesOnMap() {
         PixelReader pixelReader = mapDisplay.getImage().getPixelReader();
         for (int i = 0; i < mapDisplay.getImage().getHeight(); i++) {
             for (int j = 0; j < mapDisplay.getImage().getWidth(); j++) {
                 Color getColor = pixelReader.getColor(j, i);
-                if (getColor.equals(Color.WHITE)) {
-                    Point pixelPoint = new Point("white pixel:" + j + "x" + i, j, i);
-                    Node<Point> pixelNode = new Node<>(pixelPoint);
-                    imageArray[(i * (int) mapDisplay.getImage().getWidth()) + j] = pixelNode;
-                } else {
-                    imageArray[(i * (int) mapDisplay.getImage().getWidth()) + j]=null;
+                if (getColor.getBrightness() > .92 || getColor.equals(Color.WHITE)) {
+                    // white pixels get the value of 0
+                    imageArray[(i * (int) mapDisplay.getImage().getWidth()) + j] = 0;
+                } else if(getColor.getBrightness()<.92 || !getColor.equals(Color.WHITE)) {
+                    // rest get the value of -1
+                    imageArray[(i * (int) mapDisplay.getImage().getWidth()) + j] = -1;
                 }
             }
         }
     }
 
-
-
-    public void bfsRoute() {
-
-
-
-
-    }
 
     // connects the stand-alone nodes with another if they are next to another.
     // array starts at the top left of the map and works its to the bottom right corner.
     public void connectNodesWithLinks() {
+        //imageLocationArray = new ArrayList<>();
+        imageAgendaArray = new ArrayList<>();
+        imageLocationArray = new ArrayList<>();
+        imageLocationArray.add(((startCoord.getY()*(int)mapDisplay.getImage().getWidth())+startCoord.getX()));
+        imageLocationArray.add(((endCoord.getY()*(int)mapDisplay.getImage().getWidth())+endCoord.getX()));
         //process through the imageArray length
-        for(int i = 0; i < imageArray.length; i++) {
-            int right;
-            int down;
+        int startPixel = imageLocationArray.get(0); // gets the position of the start node in the imageArray
+        int endPixel = imageLocationArray.get(1);   // gets the position of the end node in the imageArray
+        int currentPixel;
+        // adds the starting pixel to the start of the BFS to begin the search
+        imageAgendaArray.add(startPixel);
 
-            if((i+1) < imageArray.length) {
-                right = i + 1;
+        // sets the starting pixel to a value of 1
+        imageArray[imageLocationArray.get(0)] = 1;
+        //Integer left, right= 0, up= 0, down= 0;
+        //Integer left, right, up, down;
+        while (imageLocationArray.get(0)-1 != imageLocationArray.get(1) || imageLocationArray.get(0)+1 != imageLocationArray.get(1) || imageLocationArray.get(0)+(int)mapDisplay.getImage().getWidth() != imageLocationArray.get(1) || imageLocationArray.get(0)-(int)mapDisplay.getImage().getWidth() != imageLocationArray.get(1)) {
+            //Integer left = 0, right= 0, up= 0, down= 0;
+            // gets the first pixel in queue (in the agenda) and searched all possible routes around that
+            //TODO
+            currentPixel = imageAgendaArray.get(0);
+            // directions surrounding the pixel
+//            if(currentPixel+1 < imageArray.length-1) right = imageArray[currentPixel+1];
+//            if(currentPixel-1 < 0) left = imageArray[currentPixel-1];
+//            if(currentPixel+(int)mapDisplay.getImage().getWidth() < imageArray.length-1) down = imageArray[currentPixel+(int)mapDisplay.getImage().getWidth()];
+//            if(currentPixel-(int)mapDisplay.getImage().getWidth() >= 0) up = imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()];
+//            // removes the pixel being dealt with from the agenda array
+            imageAgendaArray.remove(0);
 
-            } else right = imageArray.length-1;
+            int currentCost = imageArray[currentPixel];
 
-            if((i + (int) mapDisplay.getImage().getWidth()) < imageArray.length) {
-                down = i + (int) mapDisplay.getImage().getWidth();
-            } else down = imageArray.length-1;
+            // checks if all directions are possible
+            // checks if right is possible
+            if(imageArray[currentPixel+1] == 0 && currentPixel+1 < imageArray.length-1) {
+               // if (imageArray[currentPixel + 1] < imageArray.length && imageArray[currentPixel + 1] == 0) {
+                    //right = imageArray[currentPixel+1];
+                imageAgendaArray.add(currentPixel+1);
+                imageArray[currentPixel+1] = currentCost+1;
 
-            if(imageArray[i] != null) {
-                if(down < imageArray.length && imageArray[down] != null) {
-                    imageArray[i].connectToNodeUndirected(imageArray[down],1);
-                }
-                if(right < imageArray.length && imageArray[right] != null) {
-                    imageArray[i].connectToNodeUndirected(imageArray[right],1);
-                }
+            }
+            // checks if left is possible
+            if(imageArray[currentPixel-1] == 0 && currentPixel-1 >= 0) {
+               // if (imageArray[currentPixel - 1] < imageArray.length && imageArray[currentPixel - 1] == 0) {
+                    //left = imageArray[currentPixel - 1];
+                    imageAgendaArray.add(currentPixel-1);
+                imageArray[currentPixel-1] = currentCost+1;
+
+            }
+            // checks if down is possible
+            if(((currentPixel+(int)mapDisplay.getImage().getWidth()) < imageArray.length-1) && (imageArray[currentPixel+(int)mapDisplay.getImage().getWidth()] == 0)) {
+                    //if (imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()] < imageArray.length && imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()] == 0) {
+                    //down = imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()];
+                imageAgendaArray.add(currentPixel + (int) mapDisplay.getImage().getWidth());
+                imageArray[currentPixel + (int) mapDisplay.getImage().getWidth()] = currentCost + 1;
             }
 
+            // checks if up is possible
+            if((currentPixel-(int)mapDisplay.getImage().getWidth()) >= 0 && (imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()] == 0)) {
+                //if (imageArray[currentPixel - (int) mapDisplay.getImage().getWidth()] < imageArray.length && imageArray[currentPixel - (int) mapDisplay.getImage().getWidth()] == 0) {
+                    //up = imageArray[currentPixel - (int) mapDisplay.getImage().getWidth()];
+                imageAgendaArray.add(currentPixel-(int)mapDisplay.getImage().getWidth());
+                imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()] = currentCost+1;
+
+            }
+
+            // checks if all directions have either white or not white pixels.
+//
+//                // if down is white set it to V+1 and add to imageAgenda
+//                if (down == 0) {
+//                    imageArray[down] = currentPixel+1;
+//                    imageAgendaArray.add(imageArray[down]);
+//                }
+//                // if right is white set it to V+1 and add to imageAgenda
+//                if (right == 0) {
+//                    imageArray[right] = currentPixel+1;
+//                    imageAgendaArray.add(imageArray[right]);
+//                }
+//                // if up is white set it to V+1 and add to imageAgenda
+//                if (up == 0) {
+//                    imageArray[up] = currentPixel+1;
+//                    imageAgendaArray.add(imageArray[up]);
+//                }
+//                // if left is white set it to V+1 and add to imageAgenda
+//                if (left == 0) {
+//                    imageArray[left] = currentPixel+1;
+//                    imageAgendaArray.add(imageArray[left]);
+//                }
+//            }
+            if(currentPixel==endPixel) {
+                buildPath(); // sends the indexes to build the path
+                break;
+            }
+
+            if (imageAgendaArray.isEmpty()) {
+                System.out.println("Completed");
+            }
         }
+
+        for(int i = 0; i<imageArray.length;i++) {
+           if(imageArray[i] > 1) {
+                System.out.println("Index: " + i + " = " + imageArray[i]);
+            }
+        }
+        findBFSShort(endPixel);
     }
 
-    public Node<Point> searchForStartingMatchingPoint(Node<Point>[] imageArray) {
-        for(int i = 0; i < imageArray.length; i++) {
-            if (imageArray[i].data.getX() == startCoord.getX()) {
-                if (imageArray[i].data.getY() == startCoord.getY()) {
-                    foundStart = imageArray[i];
+    public void buildPath() {
+        //PixelReader pixelReader = mapDisplay.getImage().getPixelReader();
+        WritableImage outputImage = new WritableImage((int)mapDisplay.getImage().getWidth(), (int) mapDisplay.getImage().getHeight());
+        PixelWriter writer = outputImage.getPixelWriter();
+
+        for (int i = 0; i < mapDisplay.getImage().getHeight(); i++) {
+            for (int j = 0; j < mapDisplay.getImage().getWidth(); j++) {
+                if (imageArray[i*(int)mapDisplay.getImage().getWidth() + j] >= 1) {
+                    // white pixels get the value of 0
+                    writer.setColor(j,i,Color.GREEN);
+                } else {
+                    writer.setColor(j,i, mapDisplay.getImage().getPixelReader().getColor(j,i));
                 }
             }
-        } return foundStart;
+        }
+        mapDisplay.setImage(outputImage);
     }
 
-    public Node<Point> searchForEndingMatchingPoint(Node<Point>[] imageArray) {
-        for(int i = 0; i < imageArray.length; i++) {
-            if (imageArray[i].data.getX() == endCoord.getX()) {
-                if (imageArray[i].data.getY() == endCoord.getY()) {
-                    foundEnd = imageArray[i];
+    public void findBFSShort(int start) {
+        PixelReader pixelReader = mapDisplay.getImage().getPixelReader();
+        WritableImage outputImage = new WritableImage((int)mapDisplay.getImage().getWidth(), (int) mapDisplay.getImage().getHeight());
+
+        PixelWriter writer = outputImage.getPixelWriter();
+
+        mapDisplay.setImage(nonChangedImage);
+        // add to path list
+        ArrayList<Integer> shortestPath = new ArrayList<>();        // creates an arraylist to create the shortest path
+        int currentPixel = start;                     // retrieves the end's value
+        shortestPath.add(start);// adds the end to the start of the arraylist
+        int currentCost = imageArray[currentPixel];
+        int counter = 0;
+        while(currentCost != 1) {
+            //check left (-1)
+            if(currentPixel-1 >= 0 && imageArray[currentPixel-1] == currentCost-1) {
+                shortestPath.add(currentPixel-1);
+                currentCost = currentCost-1;
+                currentPixel = currentPixel-1;
+                counter++;
+            }
+            //check right (+1)
+            else if(currentPixel+1 < imageArray.length-1 && imageArray[currentPixel+1] == currentCost-1) {
+                shortestPath.add(currentPixel+1);
+                currentCost = currentCost-1;
+                currentPixel = currentPixel+1;
+                counter++;
+            }
+            //check up (- width)
+            else if((currentPixel-(int)mapDisplay.getImage().getWidth()) >= 0 && imageArray[currentPixel-(int)mapDisplay.getImage().getWidth()] == currentCost-1) {
+                shortestPath.add(currentPixel-(int)mapDisplay.getImage().getWidth());
+                currentCost = currentCost-1;
+                currentPixel = currentPixel-(int)mapDisplay.getImage().getWidth();
+                counter++;
+            }
+            //check down (+ width)
+            else if((currentPixel+(int)mapDisplay.getImage().getWidth()) < imageArray.length && imageArray[currentPixel+(int)mapDisplay.getImage().getWidth()] == currentCost-1) {
+                shortestPath.add((currentPixel+(int)mapDisplay.getImage().getWidth()));
+                currentCost = currentCost-1;
+                currentPixel = currentPixel+(int)mapDisplay.getImage().getWidth();
+                counter++;
+            }
+
+            if(counter == 0) {
+                int x = shortestPath.get(counter) % (int) mapDisplay.getImage().getWidth();
+                int y = shortestPath.get(counter) / (int) mapDisplay.getImage().getWidth();
+                writer.setColor(x, y, Color.PURPLE);
+            } else if (counter >= 1){
+                int x = shortestPath.get(counter-1) % (int) mapDisplay.getImage().getWidth();
+                int y = shortestPath.get(counter-1) / (int) mapDisplay.getImage().getWidth();
+                writer.setColor(x, y, Color.PURPLE);
+            }
+        }
+        mapDisplay.setImage(outputImage);
+        for (int i = 0; i < mapDisplay.getImage().getHeight(); i++) {
+            for (int j = 0; j < mapDisplay.getImage().getWidth(); j++) {
+                if (!outputImage.getPixelReader().getColor(j,i).equals(Color.PURPLE)) {
+                    // white pixels get the value of 0
+                    writer.setColor(j,i, nonChangedImage.getPixelReader().getColor(j,i));
                 }
             }
-        } return foundEnd;
+        }
+        mapDisplay.setImage(outputImage);
     }
-
-
 
 }
