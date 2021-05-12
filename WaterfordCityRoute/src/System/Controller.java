@@ -80,7 +80,6 @@ public class Controller implements Initializable {
     public int[] imageArray;
 
     @Override
-    //Initializes the images and arrays.
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //back.setImage(background);
         //nonChangedImage = cityMap;
@@ -129,7 +128,6 @@ public class Controller implements Initializable {
             djiHistRoute();
         }
     }
-    //Creates the landmarks objects from the csv file.
     public void createLandmarksObjects() throws IOException {
         String path = "WaterfordCityRoute/src/System/Coords.csv";
         FileReader file = new FileReader(path);
@@ -150,7 +148,7 @@ public class Controller implements Initializable {
         }
         createHistoricNodesSublist();
     }
-    //Creates the junction objects from the csv file.
+
     public void createJunctionObjects() throws IOException {
         String path = "WaterfordCityRoute/src/System/Junctions.csv";
         FileReader file = new FileReader(path);
@@ -171,8 +169,6 @@ public class Controller implements Initializable {
         choiceBoxLandmarks();
         showJunctions();
     }
-
-    //Displays the junction nodes on the map.
     public void showJunctions() throws IOException {
         if(!junctions.isEmpty()) {
                 for (int i = 0; i < junctions.size(); i++) {
@@ -182,8 +178,8 @@ public class Controller implements Initializable {
                     //Hover over landmark
                     rec.setX(junctions.get(i).getData().getX() - 2.5);
                     rec.setY(junctions.get(i).getData().getY() - 2.5);
-                    rec.setWidth(1);
-                    rec.setHeight(1);
+                    rec.setWidth(5);
+                    rec.setHeight(5);
                     rec.setLayoutX(mapDisplay.getLayoutX());
                     rec.setLayoutY(mapDisplay.getLayoutY());
                     ((AnchorPane) mapDisplay.getParent()).getChildren().add(rec);
@@ -206,8 +202,8 @@ public class Controller implements Initializable {
                     //Hover over landmark
                     rec.setX(landmarks.get(i).getData().getX() - 2.5);
                     rec.setY(landmarks.get(i).getData().getY() - 2.5);
-                    rec.setWidth(5);
-                    rec.setHeight(5);
+                    rec.setWidth(10);
+                    rec.setHeight(10);
                     rec.setLayoutX(mapDisplay.getLayoutX());
                     rec.setLayoutY(mapDisplay.getLayoutY());
                     ((AnchorPane) mapDisplay.getParent()).getChildren().add(rec);
@@ -251,7 +247,7 @@ public class Controller implements Initializable {
             destinationBox.getItems().add(i, landmarks.get(i).getData().getType());
         }
     }
-    //Updates the combobox.
+
     public void updateComboBox(ActionEvent event) {
         ((AnchorPane)mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Circle);
         ((AnchorPane)mapDisplay.getParent()).getChildren().removeIf(f->f instanceof Rectangle);
@@ -280,7 +276,7 @@ public class Controller implements Initializable {
             }
         } return null;
     }
-    //Matches all the nodes.
+
     public Node<Point> matchingAllNode(Node<?> node) {
         for(Node<Point> foundLandmark : allPoints) {
             if (node.getData().equals(foundLandmark.getData())) {
@@ -891,7 +887,7 @@ public class Controller implements Initializable {
         ArrayList<ArrayList<Integer>> idk = SearchLogic.findAllPathsDepthFirst(startPixel, imageArray, endPixel);
         drawDFS(idk);
         }
-        //Draws the DFS paths on the map
+
         public void drawDFS(ArrayList<ArrayList<Integer>> idk) {
             PixelReader pixelReader = mapDisplay.getImage().getPixelReader();
             WritableImage outputImage = new WritableImage((int)mapDisplay.getImage().getWidth(), (int) mapDisplay.getImage().getHeight());

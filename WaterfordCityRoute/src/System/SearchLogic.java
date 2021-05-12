@@ -1,6 +1,5 @@
 package System;
 
-import org.openjdk.jmh.annotations.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,34 +17,34 @@ public class SearchLogic <T> {
         this.start = start;
         this.end = end;
     }
-    @Benchmark
+
     //Recursive depth-first search of graph (all paths identified returned)
     public static ArrayList<ArrayList<Integer>> findAllPathsDepthFirst(int from, int[] encountered, int lookingFor) {
-        ArrayList<ArrayList<Integer>> result = null, temp2;
-        if(encountered[from] == encountered[lookingFor]) { //Found it
-            ArrayList<Integer> temp=new ArrayList<>(); //Create new single solution path list
-            temp.add(from); //Add current node to the new single path list
-            result=new ArrayList<>(); //Create new "list of lists" to store path permutations
-            result.add(temp); //Add the new single path list to the path permutations list
-            return result; //Return the path permutations list
-        }
-
-
-       //if(encountered==null) encountered =new ArrayList(); //First node so create new (empty) encountered list
-        encountered[from] = from; //Add current node to encountered list
-        for(int i = 0;i < encountered.length;i++){
-            if(encountered[i] != lookingFor) {
-                temp2=findAllPathsDepthFirst(i ,encountered,lookingFor); //Use clone of encountered list
-                //for recursive call!
-                if(temp2!=null) { //Result of the recursive call contains one or more paths to the solution node
-                    for(int j = 0; j < encountered.length; j++) //For each partial path list returned
-                        encountered[0] = from; //Add the current node to the front of each path list
-                    if(result==null) result=temp2; //If this is the first set of solution paths found use it as the result
-                    else result.addAll(temp2); //Otherwise append them to the previously found paths
-                }
-            }
-        }
-        return result;
+//        ArrayList<ArrayList<Integer>> result = null, temp2;
+//        if(encountered[from] == encountered[lookingFor]) { //Found it
+//            ArrayList<Integer> temp=new ArrayList<>(); //Create new single solution path list
+//            temp.add(from); //Add current node to the new single path list
+//            result=new ArrayList<>(); //Create new "list of lists" to store path permutations
+//            result.add(temp); //Add the new single path list to the path permutations list
+//            return result; //Return the path permutations list
+//        }
+//
+//
+//       //if(encountered==null) encountered =new ArrayList(); //First node so create new (empty) encountered list
+//        encountered[from] = from; //Add current node to encountered list
+//        for(int i = 0;i < encountered.length;i++){
+//            if(encountered[i] != lookingFor) {
+//                temp2=findAllPathsDepthFirst(i ,encountered,lookingFor); //Use clone of encountered list
+//                //for recursive call!
+//                if(temp2!=null) { //Result of the recursive call contains one or more paths to the solution node
+//                    for(int j = 0; j < encountered.length; j++) //For each partial path list returned
+//                        encountered[0] = from; //Add the current node to the front of each path list
+//                    if(result==null) result=temp2; //If this is the first set of solution paths found use it as the result
+//                    else result.addAll(temp2); //Otherwise append them to the previously found paths
+//                }
+//            }
+//        }
+        return null;
     }
 
 

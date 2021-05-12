@@ -15,8 +15,6 @@ class ControllerTest {
              c = new Controller();
     }
 
-
-
     @Test
     void createLandmarksObjects() {
         assertEquals(c.landmarks.size(),0);

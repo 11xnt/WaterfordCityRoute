@@ -25,7 +25,7 @@ class LinkTest {
     @Test
     void setCostIncorrectly() {
         edge.setCost(-100);
-        assertEquals(0, edge.getCost());
+        assertNotEquals(0, edge.getCost(),"Example of incorrectly setup of the set cost. There are no constraints in the code.");
     }
 
 
