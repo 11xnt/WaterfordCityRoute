@@ -61,7 +61,7 @@
                <graphic>
                   <ImageView fx:id="searchAnimation" fitHeight="18.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../icons8-search.gif" />
+
                      </image>
                   </ImageView>
                </graphic></Button>
@@ -69,7 +69,6 @@
                <graphic>
                   <ImageView fx:id="startBimg" fitHeight="18.0" fitWidth="22.0" pickOnBounds="true">
                      <image>
-                        <Image url="@../../../../iconfinder_gpsmapicons07_68010.png" />
                      </image>
                   </ImageView>
                </graphic></Button>
@@ -77,7 +76,6 @@
                <graphic>
                   <ImageView fx:id="endBimg" fitHeight="20.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../finish-line-flag.png" />
                      </image>
                   </ImageView>
                </graphic></Button>
@@ -86,7 +84,6 @@
                <graphic>
                   <ImageView fx:id="refreshGif" fitHeight="20.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../../../refresh.gif" />
                      </image>
                   </ImageView>
                </graphic></Button>
