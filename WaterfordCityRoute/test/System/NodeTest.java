@@ -13,13 +13,21 @@ class NodeTest {
     @BeforeEach
     void setUp() {
 
-        nodeA = new Node<>(100);
-        nodeB = new Node<>(200);
+        nodeA = new Node(100);
+        nodeB = new Node(200);
     }
 
     @Test
     void connectNodeDirectedTest() {
         nodeA.connectToNodeDirected(nodeB, 100);
+
+        assertEquals(nodeA.getAdjList().get(0).getDestNode(), nodeB);
+    }
+
+
+    @Test
+    void connectNodeUnDirectedTest() {
+        nodeA.connectToNodeUndirected(nodeB, 100);
 
         assertEquals(nodeA.getAdjList().get(0).getDestNode(), nodeB);
     }

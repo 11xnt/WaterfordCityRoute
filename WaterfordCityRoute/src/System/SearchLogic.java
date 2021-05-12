@@ -1,8 +1,11 @@
 package System;
 
+import org.openjdk.jmh.annotations.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class SearchLogic <T> {
 
@@ -15,7 +18,7 @@ public class SearchLogic <T> {
         this.start = start;
         this.end = end;
     }
-
+    @Benchmark
     //Recursive depth-first search of graph (all paths identified returned)
     public static ArrayList<ArrayList<Integer>> findAllPathsDepthFirst(int from, int[] encountered, int lookingFor) {
         ArrayList<ArrayList<Integer>> result = null, temp2;

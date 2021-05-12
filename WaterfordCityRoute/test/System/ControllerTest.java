@@ -9,9 +9,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ControllerTest {
-        List<Node<Point>> landmarks = new ArrayList<>();
-        List<Node<Point>> historicLandmarks = new ArrayList<>();
-        List<Node<Point>> junctions = new ArrayList<>();
         Controller c;
     @BeforeEach
     void setUp() {
@@ -38,24 +35,4 @@ class ControllerTest {
         assertEquals(c.junctions.size(), 0);
     }
 
-
-    @Test
-    void connectJunctions() {
-    }
-
-    @Test
-    void establishNodesOnMap() {
-    }
-
-    @Test
-    void connectNodesWithLinks() {
-    }
-
-    @Test
-    void searchForStartingMatchingPoint() {
-    }
-
-    @Test
-    void searchForEndingMatchingPoint() {
-    }
 }
